@@ -149,7 +149,7 @@ xcodebuild -project src/ios/Fin.xcodeproj -scheme Fin \
 |---|---|
 | JDK | **17** (`sourceCompatibility`/`targetCompatibility` are 17) |
 | Android SDK | **compileSdk 36**, targetSdk 35, **minSdk 26** |
-| Android NDK | **r28+** — set `$ANDROID_NDK_HOME`, or install via Android Studio |
+| Android NDK | **r28 — `28.2.13676358`** (pinned via `ndkVersion` in `app/build.gradle.kts`; install it through the SDK Manager and point `$ANDROID_NDK_HOME` at it for `build_proot.sh`) |
 | CMake | 3.22.1 (install through the SDK Manager) |
 | Shell tools | `curl`, `tar`, `make`, `awk`, `sed` |
 
@@ -213,6 +213,24 @@ required to produce one locally.
 ./gradlew :app:connectedAndroidTest     # instrumented; needs a device/emulator
 ```
 
+### Continuous integration
+
+[`.github/workflows/android.yml`](.github/workflows/android.yml) runs the exact
+sequence above on a GitHub-hosted `ubuntu-24.04` runner — `build_proot.sh`,
+`prepare_android_sandbox.sh`, `:app:assembleDebug`, `:app:testDebugUnitTest` —
+for every push and pull request that touches the Android build (`src/android`,
+`src/shared`, the proot submodule and the two scripts). The debug APK is
+published as a workflow artifact named `Fin-<version>-debug-<sha>.apk`;
+[`.github/scripts/stage_apk.sh`](.github/scripts/stage_apk.sh) refuses to
+publish an APK that is missing the proot binary, the loaders or the Alpine
+rootfs, so a green run means the sandbox is really inside the package.
+
+Run it by hand from the **Actions → Android APK → Run workflow** button; tick
+*build_release* to additionally get the R8-minified `Fin-<version>-release-<sha>.apk`
+(still signed with the debug key — no secrets are involved). The NDK and CMake
+versions the workflow installs are read from `app/build.gradle.kts`, so bumping
+them there is the only change needed.
+
 ---
 
 ## Troubleshooting
@@ -230,9 +248,9 @@ the simulator note above.
 **iOS: MP3 encoding unavailable** — `build_lame.sh` did not run before
 `build_ffmpeg.sh`. Rerun both in order.
 
-**Android: `Android NDK not found`** — set `ANDROID_NDK_HOME` to your NDK r28+
-installation, e.g.
-`export ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/28.0.12433566`.
+**Android: `Android NDK not found`** — set `ANDROID_NDK_HOME` to the NDK
+release pinned in `app/build.gradle.kts`, e.g.
+`export ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/28.2.13676358`.
 
 **Android: app starts but the shell does not** — the sandbox assets are
 missing. Rerun `./deps/build_proot.sh` and

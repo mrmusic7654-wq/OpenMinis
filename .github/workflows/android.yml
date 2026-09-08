@@ -1,0 +1,208 @@
+# Builds the Android APK on GitHub-hosted runners and publishes it as a
+# workflow artifact (Actions tab → run → "Artifacts").
+#
+# What a run does, in order:
+#   1. Checks out the repo plus the deps/proot submodule (deps/ish is iOS-only).
+#   2. Installs the NDK + CMake versions the Gradle build is pinned to
+#      (read from src/android/app/build.gradle.kts so there is one source of truth).
+#   3. Runs the same two native-prep scripts BUILDING.md tells developers to run:
+#        ./deps/build_proot.sh              (proot binary + jniLibs, NDK cross-build)
+#        ./scripts/prepare_android_sandbox.sh   (Alpine minirootfs)
+#   4. ./gradlew :app:assembleDebug   → uploads Fin-<version>-debug-<sha>.apk
+#   5. ./gradlew :app:testDebugUnitTest
+#   6. (workflow_dispatch only, opt-in) ./gradlew :app:assembleRelease → uploads
+#      Fin-<version>-release-<sha>.apk. Release is minified but signed with the
+#      debug keystore (see build.gradle.kts), so no secrets are needed.
+#
+# Nothing is signed with a real key and nothing is published to a GitHub
+# Release; this is a build/verification workflow.
+
+name: Android APK
+
+on:
+  push:
+    # `paths` filters are ignored for tag pushes; scoping the trigger to
+    # branches keeps this from running for every tag.
+    branches: ['**']
+    paths:
+      - '.github/workflows/android.yml'
+      - '.github/scripts/stage_apk.sh'
+      - '.gitmodules'
+      - 'deps/build_proot.sh'
+      - 'deps/proot'
+      - 'deps/talloc/**'
+      - 'scripts/prepare_android_sandbox.sh'
+      - 'scripts/gen_debug_skill_android.sh'
+      - 'src/android/**'
+      - 'src/shared/**'
+  pull_request:
+    paths:
+      - '.github/workflows/android.yml'
+      - '.github/scripts/stage_apk.sh'
+      - '.gitmodules'
+      - 'deps/build_proot.sh'
+      - 'deps/proot'
+      - 'deps/talloc/**'
+      - 'scripts/prepare_android_sandbox.sh'
+      - 'scripts/gen_debug_skill_android.sh'
+      - 'src/android/**'
+      - 'src/shared/**'
+  workflow_dispatch:
+    inputs:
+      build_release:
+        description: 'Also build the release APK (R8-minified, debug-signed)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+# One build per branch/PR at a time; a newer push cancels the older run.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build APK
+    # Same-repo PRs already get a run from the `push` event; only run the
+    # pull_request variant for PRs that come from forks.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    # Pinned rather than ubuntu-latest so the preinstalled Android SDK/NDK set
+    # does not change underneath us; the SDK step below installs anything the
+    # image lacks, so bumping this is safe.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          # Only deps/proot is needed for Android; deps/ish is the iOS kernel.
+          submodules: false
+
+      - name: Check out deps/proot submodule
+        run: git submodule update --init deps/proot
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        # Caches ~/.gradle (wrapper distribution + dependency caches) between
+        # runs, validates gradle-wrapper.jar and adds a build summary to the
+        # job page.
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          # The default only writes the cache from the default branch; this
+          # repo builds mostly on feature branches, so let those save too.
+          cache-read-only: false
+
+      - name: Read pinned NDK and CMake versions from build.gradle.kts
+        id: versions
+        run: |
+          set -euo pipefail
+          gradle_file=src/android/app/build.gradle.kts
+          ndk="$(grep -oP '^\s*ndkVersion\s*=\s*"\K[^"]+' "$gradle_file" || true)"
+          cmake="$(grep -oP '^\s*version\s*=\s*"\K[^"]+' "$gradle_file" || true)"
+          if [ "$(printf '%s\n' "$ndk" | grep -c .)" != 1 ]; then
+            echo "::error file=$gradle_file::expected exactly one 'ndkVersion = \"...\"' line, got: '$ndk'"; exit 1
+          fi
+          if [ "$(printf '%s\n' "$cmake" | grep -c .)" != 1 ]; then
+            echo "::error file=$gradle_file::expected exactly one cmake 'version = \"...\"' line, got: '$cmake'"; exit 1
+          fi
+          echo "NDK $ndk, CMake $cmake"
+          echo "ndk=$ndk" >> "$GITHUB_OUTPUT"
+          echo "cmake=$cmake" >> "$GITHUB_OUTPUT"
+
+      - name: Install Android SDK components
+        env:
+          NDK_VERSION: ${{ steps.versions.outputs.ndk }}
+          CMAKE_VERSION: ${{ steps.versions.outputs.cmake }}
+        run: |
+          set -euo pipefail
+          : "${ANDROID_HOME:?ANDROID_HOME is not set — is this an Android-capable runner image?}"
+          sdkmanager="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          [ -x "$sdkmanager" ] || sdkmanager="$(command -v sdkmanager)"
+
+          # Licences are pre-accepted on hosted runners; harmless elsewhere.
+          yes | "$sdkmanager" --licenses >/dev/null 2>&1 || true
+          # The NDK is usually preinstalled (no-op); SDK CMake 3.22.1 is not.
+          # stdin from /dev/null so an unexpected prompt can never hang the job.
+          "$sdkmanager" --install "ndk;$NDK_VERSION" "cmake;$CMAKE_VERSION" </dev/null >/dev/null
+
+          ndk_dir="$ANDROID_HOME/ndk/$NDK_VERSION"
+          for f in \
+            "$ndk_dir/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android26-clang" \
+            "$ANDROID_HOME/cmake/$CMAKE_VERSION/bin/cmake"; do
+            if [ ! -x "$f" ]; then
+              echo "::error::missing after sdkmanager install: $f"; exit 1
+            fi
+          done
+
+          # deps/build_proot.sh resolves the NDK through these variables. The
+          # runner image points them at a different NDK release by default,
+          # so override them for every following step.
+          {
+            echo "ANDROID_NDK_HOME=$ndk_dir"
+            echo "ANDROID_NDK_ROOT=$ndk_dir"
+            echo "ANDROID_NDK=$ndk_dir"
+          } >> "$GITHUB_ENV"
+
+      - name: Build proot (sandbox runtime) with the NDK
+        run: ./deps/build_proot.sh
+
+      - name: Download Alpine minirootfs
+        # Must run after build_proot.sh: with the proot binary already in
+        # place the script only fetches the rootfs tarball.
+        run: ./scripts/prepare_android_sandbox.sh
+
+      - name: Build debug APK
+        working-directory: src/android
+        run: ./gradlew :app:assembleDebug --stacktrace
+
+      - name: Stage debug APK
+        id: stage_debug
+        run: ./.github/scripts/stage_apk.sh debug
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v7
+        with:
+          # archive: false uploads the bare .apk (artifact is named after the
+          # file) instead of a zip that has to be unpacked first.
+          path: ${{ steps.stage_debug.outputs.path }}
+          archive: false
+          if-no-files-found: error
+
+      - name: Run JVM unit tests
+        id: unit_tests
+        working-directory: src/android
+        run: ./gradlew :app:testDebugUnitTest --stacktrace
+
+      - name: Upload unit test reports
+        if: failure() && steps.unit_tests.outcome == 'failure'
+        uses: actions/upload-artifact@v7
+        with:
+          name: unit-test-reports
+          path: src/android/app/build/reports/tests/testDebugUnitTest/
+          if-no-files-found: ignore
+
+      - name: Build release APK
+        if: github.event_name == 'workflow_dispatch' && inputs.build_release
+        working-directory: src/android
+        run: ./gradlew :app:assembleRelease --stacktrace
+
+      - name: Stage release APK
+        if: github.event_name == 'workflow_dispatch' && inputs.build_release
+        id: stage_release
+        run: ./.github/scripts/stage_apk.sh release
+
+      - name: Upload release APK
+        if: github.event_name == 'workflow_dispatch' && inputs.build_release
+        uses: actions/upload-artifact@v7
+        with:
+          path: ${{ steps.stage_release.outputs.path }}
+          archive: false
+          if-no-files-found: error

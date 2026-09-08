@@ -31,6 +31,12 @@ android {
     // Android 16 behavior changes; the Live Updates path is runtime-gated on
     // Build.VERSION.SDK_INT >= 36 (see DynamicIslandSupport / AgentForegroundService).
     compileSdk = 36
+    // NDK r28 LTS. Pinned so every machine (and CI) builds the JNI libs with
+    // the same toolchain; without it AGP falls back to $ANDROID_NDK_HOME or
+    // the newest NDK it finds, which differs per machine. Keep in sync with
+    // the NDK used for deps/build_proot.sh — .github/workflows/android.yml
+    // reads this line and installs exactly this version.
+    ndkVersion = "28.2.13676358"
 
     defaultConfig {
         applicationId = "com.mrmusic.fin"

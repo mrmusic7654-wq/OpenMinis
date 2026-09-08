@@ -2,6 +2,7 @@
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![Platforms](https://img.shields.io/badge/Platforms-iOS%20%7C%20Android-lightgrey.svg)](#beta-programme)
+[![Android APK](https://github.com/mrmusic7654-wq/OpenMinis/actions/workflows/android.yml/badge.svg)](https://github.com/mrmusic7654-wq/OpenMinis/actions/workflows/android.yml)
 
 **Your private, on-device AI agent.**
 
