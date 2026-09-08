@@ -45,7 +45,6 @@ required=(
   lib/arm64-v8a/libproot-loader.so
   lib/arm64-v8a/libproot-loader32.so
   assets/proot-aarch64
-  assets/alpine-minirootfs.tar.gz
 )
 listing="$(unzip -Z1 "$apk")"
 missing=0
@@ -55,6 +54,13 @@ for entry in "${required[@]}"; do
     missing=1
   fi
 done
+# AAPT may transparently gunzip the rootfs and package it as .tar; the app
+# (RootfsManager.ROOTFS_ASSET / ROOTFS_ASSET_TAR) tries both names, so accept
+# either here too.
+if ! grep -qxE -- 'assets/alpine-minirootfs\.tar(\.gz)?' <<<"$listing"; then
+  echo "error: $(basename "$apk") does not contain assets/alpine-minirootfs.tar.gz (or .tar)" >&2
+  missing=1
+fi
 if [ "$missing" -ne 0 ]; then
   echo "error: the APK would ship with a broken sandbox. Run ./deps/build_proot.sh and" >&2
   echo "       ./scripts/prepare_android_sandbox.sh, then rebuild (see BUILDING.md)." >&2
