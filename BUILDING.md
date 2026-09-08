@@ -225,6 +225,14 @@ published as a workflow artifact named `Fin-<version>-debug-<sha>.apk`;
 publish an APK that is missing the proot binary, the loaders or the Alpine
 rootfs, so a green run means the sandbox is really inside the package.
 
+The unit-test step is currently **non-blocking**: the public mirror inherits a
+set of tests that cannot pass here (`AnthropicProviderTest` needs the private
+`ANTHROPIC_OAUTH_IDENTIFIER_PROMPT`, `OpenAIProviderTest` fixtures predate the
+empty-stream guard, and four `TerminalSanitizerTest` CR-folding cases fail on
+`main` too). Results are summarised on the run page and the HTML report is
+attached as the `unit-test-reports` artifact; remove `continue-on-error` from
+the step once those are fixed.
+
 Run it by hand from the **Actions → Android APK → Run workflow** button; tick
 *build_release* to additionally get the R8-minified `Fin-<version>-release-<sha>.apk`
 (still signed with the debug key — no secrets are involved). The NDK and CMake
