@@ -319,7 +319,7 @@ final class CrashReporter: NSObject, MXMetricManagerSubscriber {
     /// TweakInject, …). Detection only — no enforcement, no exit, no UI. The
     /// marker list is matched against the full image path lowercased, so both
     /// runtime-injected (/usr/lib/TweakInject/…) and repackaged-into-bundle
-    /// (Minis.app/Frameworks/SomeTweak.dylib via CydiaSubstrate) variants hit.
+    /// (Fin.app/Frameworks/SomeTweak.dylib via CydiaSubstrate) variants hit.
     /// Cached after the first scan: the loaded-image set relevant to this
     /// check is fixed at process start.
     private static var cachedInjectedDylibs: [String]?
@@ -871,7 +871,7 @@ final class CrashReporter: NSObject, MXMetricManagerSubscriber {
         let dateStr = df.string(from: crashDate)
 
         var report = """
-        === Minis Crash Report ===
+        === Fin Crash Report ===
         Date:    \(dateStr)
         Type:    \(type)
         Build:   \(displayBuild)
@@ -892,7 +892,7 @@ final class CrashReporter: NSObject, MXMetricManagerSubscriber {
         let foreign = Self.detectInjectedDylibs()
         if !foreign.isEmpty {
             report += "\n⚠️ Injected: \(foreign.joined(separator: ", "))"
-            report += "\n         (third-party tweak/hook libraries loaded in-process — crashes may originate there, not in Minis)"
+            report += "\n         (third-party tweak/hook libraries loaded in-process — crashes may originate there, not in Fin)"
         }
 
         if let phase = lastPhase {

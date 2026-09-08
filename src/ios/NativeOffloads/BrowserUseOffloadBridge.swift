@@ -1,6 +1,6 @@
 //
 //  BrowserUseOffloadBridge.swift
-//  MinisApp
+//  FinApp
 //
 //  Swift bridge for BrowserTabPool, called from BrowserUseOffload.m.
 //  BrowserTabPool is Swift-only and @MainActor; this class exposes

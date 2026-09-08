@@ -1,6 +1,6 @@
 //
 //  NativeOffloadUtils.h
-//  MinisApp
+//  FinApp
 //
 //  Shared utilities for native offload CLI tools.
 //  Provides arg parsing, JSON envelope construction, date parsing,

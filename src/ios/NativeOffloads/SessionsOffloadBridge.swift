@@ -1,6 +1,6 @@
 //
 //  SessionsOffloadBridge.swift
-//  MinisApp
+//  FinApp
 //
 //  Swift bridge for minis-sessions-cli offload.
 //  Provides synchronous @objc entry points that query ChatStore.

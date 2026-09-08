@@ -1,6 +1,6 @@
 //
 //  MinisFsRouter.swift
-//  MinisApp
+//  FinApp
 //
 //  Routes guest paths under /var/minis/{offloads,attachments,workspace,browser}
 //  to per-session host directories via the iSH fakefs path-translate hook.

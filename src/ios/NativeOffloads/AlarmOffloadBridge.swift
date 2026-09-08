@@ -1,6 +1,6 @@
 //
 //  AlarmOffloadBridge.swift
-//  MinisApp
+//  FinApp
 //
 //  Swift bridge for AlarmKit, called from AlarmOffload.m.
 //  AlarmKit is Swift-only; this class exposes alarm operations as
@@ -15,7 +15,7 @@ import AlarmKit
 
 /// Empty metadata conforming to AlarmMetadata for our alarms.
 @available(iOS 26.0, *)
-nonisolated struct MinisAlarmMetadata: AlarmMetadata {}
+nonisolated struct FinAlarmMetadata: AlarmMetadata {}
 
 @available(iOS 26.0, *)
 @objc public class AlarmOffloadBridge: NSObject {
@@ -27,7 +27,7 @@ nonisolated struct MinisAlarmMetadata: AlarmMetadata {}
     // recover the label the user/AI set at schedule time. We therefore persist
     // an id -> label map and look it up when listing. The store is kept in sync
     // on cancel / cancel-all so it doesn't grow unbounded. This is what makes
-    // the label visible in the Minis AlarmListView (AlarmRowView already renders
+    // the label visible in the Fin AlarmListView (AlarmRowView already renders
     // `alarm.label` when non-empty).
     //
     // Backed by a tiny SQLite table (AlarmLabelStore) in the same MinisChat/
@@ -100,7 +100,7 @@ nonisolated struct MinisAlarmMetadata: AlarmMetadata {}
                     title: LocalizedStringResource(stringLiteral: label),
                     stopButton: stopButton
                 )
-                let attributes = AlarmAttributes<MinisAlarmMetadata>(
+                let attributes = AlarmAttributes<FinAlarmMetadata>(
                     presentation: AlarmPresentation(alert: alert),
                     tintColor: .blue
                 )
@@ -181,7 +181,7 @@ nonisolated struct MinisAlarmMetadata: AlarmMetadata {}
                     title: LocalizedStringResource(stringLiteral: label),
                     stopButton: stopButton
                 )
-                let attributes = AlarmAttributes<MinisAlarmMetadata>(
+                let attributes = AlarmAttributes<FinAlarmMetadata>(
                     presentation: AlarmPresentation(alert: alert),
                     tintColor: .orange
                 )

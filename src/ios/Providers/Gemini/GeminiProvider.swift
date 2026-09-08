@@ -414,8 +414,8 @@ final class GeminiProvider: LLMProvider {
         } else {
             // Direct REST (api-key / manual-token) path sets no UA otherwise, so
             // URLSession would send its build-number default. Use the app default
-            // (Minis/<marketing>) instead. Never overrides the Cloud Code UA above.
-            request.setValue(MinisUserAgent.default, forHTTPHeaderField: "User-Agent")
+            // (Fin/<marketing>) instead. Never overrides the Cloud Code UA above.
+            request.setValue(FinUserAgent.default, forHTTPHeaderField: "User-Agent")
         }
 
         // sortedKeys: stable byte-level prefix so server-side prompt caches

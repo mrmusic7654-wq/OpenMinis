@@ -1,6 +1,6 @@
 //
 //  ConfigOffload.m
-//  MinisApp
+//  FinApp
 //
 //  Native offload handler for `minis-config`.
 //  Subcommands: list-topics, topic-help, get, set, set-batch,
@@ -15,8 +15,8 @@
 #import "NativeOffloadUtils.h"
 #include "kernel/native_offload.h"
 
-#if __has_include("Minis-Swift.h")
-#import "Minis-Swift.h"
+#if __has_include("Fin-Swift.h")
+#import "Fin-Swift.h"
 #else
 @interface ConfigOffloadBridge : NSObject
 + (BOOL)isEnabled;
@@ -57,7 +57,7 @@ static NSString *const TOOL_NAME = @"minis-config";
 #define EXIT_PERMISSION_DENIED 126
 
 static NSString *const HELP_TEXT =
-    @"minis-config - read or change Minis app settings (logged + revertable)\n"
+    @"minis-config - read or change Fin app settings (logged + revertable)\n"
      "\n"
      "USAGE:\n"
      "  minis-config <subcommand> [args]\n"

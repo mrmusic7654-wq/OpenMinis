@@ -1,6 +1,6 @@
 //
 //  VideoPlayer.swift
-//  MinisApp
+//  FinApp
 //
 //  Inline video thumbnail bubble + fullscreen player overlay +
 //  AVPlayerLayer UIViewRepresentable. Extracted from AIChatView.swift.
@@ -423,7 +423,7 @@ struct MinisVideoFullscreenPlayer: View {
             player = nil
         }
         .sheet(isPresented: $showShareSheet) {
-            MinisShareSheet(url: fileURL)
+            FinShareSheet(url: fileURL)
         }
         .statusBar(hidden: true)
     }

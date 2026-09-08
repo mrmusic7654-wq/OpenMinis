@@ -1,6 +1,6 @@
 //
 //  SpeakOffload.m
-//  MinisApp
+//  FinApp
 //
 //  Native offload handler for `apple-speak`.
 //  Subcommands: speak, voices, stop

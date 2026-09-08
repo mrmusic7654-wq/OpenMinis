@@ -75,7 +75,7 @@ final class ShareCoordinator: ObservableObject {
     /// [T-share-double-raise] `hasPendingShare` alone cannot coalesce
     /// concurrent raises: it stays false for the whole sleep, so a second call
     /// inside that window passed the guard and scheduled a SECOND flip. The URL
-    /// genuinely arrives twice on every share — MinisApp.onOpenURL and
+    /// genuinely arrives twice on every share — FinApp.onOpenURL and
     /// AppDelegate's scene openURLContexts both route it to DeepLinkRouter —
     /// so this is the normal path, not an edge case.
     private var raiseInFlight = false
@@ -154,7 +154,7 @@ final class ShareCoordinator: ObservableObject {
             shareLog.info("[Share] consumeBuffer: expired (age=\(String(format: "%.1f", age))s > \(Self.bufferTTL)s), discarding")
             SharedContainerStore.cleanSharedFiles()
             // [T-share-buffer-merge] Never drop a share silently: the user
-            // explicitly shared content into Minis — tell them it didn't make
+            // explicitly shared content into Fin — tell them it didn't make
             // it instead of letting the screenshot vanish into thin air.
             Task { @MainActor in
                 ShareFeedbackToast.show(String(localized: "Shared content expired. Please share again."))

@@ -1,6 +1,6 @@
 //
 //  AIChatViewModel+ConcurrentTools.swift
-//  MinisApp
+//  FinApp
 //
 //  Concurrent tool execution: dispatches up to `maxConcurrentTools` tool
 //  calls in parallel via TaskGroup, waits for all to complete, then

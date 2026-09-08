@@ -18,7 +18,7 @@ final class SpeechFinishedDelegate: NSObject, AVSpeechSynthesizerDelegate {
     }
 }
 
-// MARK: - Minis URL Capture Broker
+// MARK: - Fin URL Capture Broker
 
 /// Shared broker for URLs captured from shell tool stdout via the OSC
 /// MinisOpenURL marker (emitted by /usr/local/bin/minis-open). Both
@@ -66,7 +66,7 @@ final class MinisOpenURLBroker: ObservableObject {
     }
 }
 
-// MARK: - Minis URL Marker Parser
+// MARK: - Fin URL Marker Parser
 
 /// Recognises the OSC 1337 `MinisOpenURL` escape sequence emitted by the
 /// rootfs shim at `/usr/local/bin/minis-open` (see default_mount). The shim

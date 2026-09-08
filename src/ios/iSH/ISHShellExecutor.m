@@ -1,6 +1,6 @@
 //
 //  ISHShellExecutor.m
-//  MinisApp
+//  FinApp
 //
 //  Shell execution implementation with line-by-line output and process completion
 //

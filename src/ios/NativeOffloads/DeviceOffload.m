@@ -1,6 +1,6 @@
 //
 //  DeviceOffload.m
-//  MinisApp
+//  FinApp
 //
 //  Native offload handler for `apple-device`.
 //  Subcommands: info, battery, storage

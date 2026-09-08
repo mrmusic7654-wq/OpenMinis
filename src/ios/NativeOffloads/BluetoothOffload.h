@@ -1,6 +1,6 @@
 //
 //  BluetoothOffload.h
-//  MinisApp
+//  FinApp
 //
 //  Native offload handler for `apple-bluetooth` — CoreBluetooth BLE operations.
 //

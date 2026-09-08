@@ -22,7 +22,7 @@ final class ConfigRegistry {
     private var collections: [String: ConfigCollection] = [:]
     private var didRegisterBuiltins = false
 
-    /// Idempotent. Called from `MinisApp.onAppear`. Splitting initial
+    /// Idempotent. Called from `FinApp.onAppear`. Splitting initial
     /// load from the singleton init avoids touching managers (whose
     /// own init may have side effects) before the app is ready.
     func registerBuiltinsIfNeeded() {

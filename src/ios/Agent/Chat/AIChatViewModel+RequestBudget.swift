@@ -4,7 +4,7 @@ import UIKit
 
 private let logger = AppLogger(category: "AIChatVM")
 
-// MARK: - Request-level image budget + Minis paths + tool-output offload
+// MARK: - Request-level image budget + Fin paths + tool-output offload
 
 extension AIChatViewModel {
 
@@ -244,7 +244,7 @@ extension AIChatViewModel {
     /// App Group container root for FileProvider-visible directories.
     /// Everything under this path is exposed to iOS Files via the replicated
     /// FileProvider extension. Keep ONLY user-facing subdirs (shared, skills,
-    /// memory) here — anything else leaks into "On My iPhone → Minis".
+    /// memory) here — anything else leaks into "On My iPhone → Fin".
     nonisolated static var minisAppGroupRoot: URL {
         FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: SharedContainerStore.appGroupID

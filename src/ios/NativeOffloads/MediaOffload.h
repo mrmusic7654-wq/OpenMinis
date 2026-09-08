@@ -1,6 +1,6 @@
 //
 //  MediaOffload.h
-//  MinisApp
+//  FinApp
 //
 //  Native offload handler for `apple-media` — MediaPlayer framework.
 //

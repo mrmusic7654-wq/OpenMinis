@@ -1,6 +1,6 @@
 //
 //  SkillStore.swift
-//  MinisApp
+//  FinApp
 //
 //  Manages AI skill (SKILL.md) lifecycle: import, storage, session overrides,
 //  and system prompt injection.  All metadata is stored in a SQLite database

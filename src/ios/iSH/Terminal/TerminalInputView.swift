@@ -1,6 +1,6 @@
 //
 //  TerminalInputView.swift
-//  MinisApp
+//  FinApp
 //
 //  UIViewRepresentable keyboard input capture using UITextInput.
 //  Supports CJK (Chinese/Japanese/Korean) input methods by handling

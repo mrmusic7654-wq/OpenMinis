@@ -1,6 +1,6 @@
 //
 //  TerminalCanvasView.swift
-//  MinisApp
+//  FinApp
 //
 //  UIScrollView-backed terminal renderer using UITextView for native text selection.
 //  Uses NSAttributedString for ANSI color rendering with a cursor overlay.

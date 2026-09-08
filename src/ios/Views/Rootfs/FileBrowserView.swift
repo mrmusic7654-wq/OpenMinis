@@ -1,6 +1,6 @@
 //
 //  FileBrowserView.swift
-//  MinisApp
+//  FinApp
 //
 //  File browser for exploring and exporting files from the rootfs
 //
@@ -888,7 +888,7 @@ struct FileItemRow: View {
 /// The source lives on the rootfs/fakefs, which isn't a stable URL the share
 /// extensions can read, so we stage a copy in tmp first (mirrors the old
 /// export path), then hand it to `UIActivityViewController` (reusing
-/// `MinisShareSheet.sanitizedShareURL` for the ShareKit UTI crash mitigation).
+/// `FinShareSheet.sanitizedShareURL` for the ShareKit UTI crash mitigation).
 struct DocumentExportView: UIViewControllerRepresentable {
     let fileURL: URL
 
@@ -898,7 +898,7 @@ struct DocumentExportView: UIViewControllerRepresentable {
             .appendingPathComponent(fileURL.lastPathComponent)
         try? FileManager.default.removeItem(at: staged)
         try? FileManager.default.copyItem(at: fileURL, to: staged)
-        let shareURL = MinisShareSheet.sanitizedShareURL(staged) ?? staged
+        let shareURL = FinShareSheet.sanitizedShareURL(staged) ?? staged
         return UIActivityViewController(activityItems: [shareURL], applicationActivities: nil)
     }
 
@@ -1114,7 +1114,7 @@ class FileBrowserViewModel: ObservableObject {
         }
         guard let targetID = parentID else { return }
 
-        let domainIdentifier = NSFileProviderDomainIdentifier("com.openminis.app.files")
+        let domainIdentifier = NSFileProviderDomainIdentifier("com.mrmusic.fin.files")
         NSFileProviderManager.getDomainsWithCompletionHandler { domains, _ in
             guard let domain = domains.first(where: { $0.identifier == domainIdentifier }) else {
                 return

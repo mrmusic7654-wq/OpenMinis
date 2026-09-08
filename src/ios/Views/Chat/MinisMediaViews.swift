@@ -383,7 +383,7 @@ private struct MinisFileChipView: View {
         }
         .sheet(isPresented: $showShareSheet) {
             if let fileURL = resolveMinisFileURL(url: url) {
-                MinisShareSheet(url: fileURL)
+                FinShareSheet(url: fileURL)
             }
         }
     }
@@ -906,7 +906,7 @@ struct MinisTextPreviewView: View {
                 }
             }
             .sheet(isPresented: $showShareSheet) {
-                MinisShareSheet(url: fileURL)
+                FinShareSheet(url: fileURL)
             }
         }
         // Re-read when the file's mtime/size changes, not just on first
@@ -1036,7 +1036,7 @@ struct MinisMarkdownPreviewView: View {
                 }
             }
             .sheet(isPresented: $showShareSheet) {
-                MinisShareSheet(url: fileURL)
+                FinShareSheet(url: fileURL)
             }
         }
         .modifier(WideSheetSizingModifier())
@@ -1119,7 +1119,7 @@ struct MinisHTMLPreviewView: View {
                     }
                 }
                 .sheet(isPresented: $showShareSheet) {
-                    MinisShareSheet(url: fileURL)
+                    FinShareSheet(url: fileURL)
                 }
                 .sheet(isPresented: $showAddToHomeSheet) {
                     WebAppAddToHomeSheet(htmlURL: fileURL,

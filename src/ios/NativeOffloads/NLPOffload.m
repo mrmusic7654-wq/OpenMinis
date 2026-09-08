@@ -1,6 +1,6 @@
 //
 //  NLPOffload.m
-//  MinisApp
+//  FinApp
 //
 //  Native offload handler for `apple-nlp`.
 //  Subcommands: language, tokenize, pos, ner, sentiment, embed, analyze

@@ -1,6 +1,6 @@
 //
 //  MCPOAuthController.swift
-//  MinisApp
+//  FinApp
 //
 //  [T-mcp-static-oauth] Native OAuth for MCP servers — Static mode (user-supplied
 //  Client ID + optional Client Secret, PKCE Authorization Code flow).
@@ -89,7 +89,7 @@ final class MCPOAuthController: NSObject, ObservableObject {
 
     // MARK: - Keychain (non-synchronizable — secrets never ride iCloud)
 
-    nonisolated private static let keychainService = "com.openminis.app.mcp-oauth"
+    nonisolated private static let keychainService = "com.mrmusic.fin.mcp-oauth"
 
     nonisolated private static func keychainSet(_ data: Data, account: String) {
         let match: [String: Any] = [

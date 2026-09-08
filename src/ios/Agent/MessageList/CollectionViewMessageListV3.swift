@@ -198,7 +198,7 @@ struct CollectionViewMessageListV3: UIViewControllerRepresentable {
 
 // MARK: - V3 Bridged Cell Views (no GeometryReader)
 
-/// Header: "✦ Minis" label at the top of each assistant turn.
+/// Header: "✦ Fin" label at the top of each assistant turn.
 /// Name comes from SOUL.md (user-editable in Soul Settings); the
 /// sparkles glyph is fixed — custom emoji is no longer supported,
 /// matching the Soul Settings UI.
@@ -218,7 +218,7 @@ private struct BridgedAssistantHeaderV3: View {
                         endPoint: .bottomTrailing
                     )
                 )
-            Text(soulMeta.name.isEmpty ? "Minis" : soulMeta.name)
+            Text(soulMeta.name.isEmpty ? "Fin" : soulMeta.name)
                 .font(.body.weight(.semibold))
                 .foregroundStyle(ChatColors.primaryText)
         }
@@ -1331,7 +1331,7 @@ extension CollectionViewMessageListV3 {
                 ? { [weak vm] in vm?.readReplyFromStart(message) }
                 : nil
             // [T-selection-menu-minis-tts] "Read Selection" from the text
-            // selection menu — speaks the selected snippet via the Minis TTS
+            // selection menu — speaks the selected snippet via the Fin TTS
             // stack (sanitizer + provider voices + fail-over).
             bridge.onSpeakText = { [weak vm] text in vm?.speakText(text) }
             bridge.onCopyScreenshot = { [weak self, weak vm] in
@@ -2654,7 +2654,7 @@ extension CollectionViewMessageListV3 {
 
                     switch item {
                     case .assistantHeader:
-                        // Header is always a fixed "sparkles Minis" label row (measured: 28pt)
+                        // Header is always a fixed "sparkles Fin" label row (measured: 28pt)
                         layout.setEstimatedHeight(28, at: i)
 
                     case .assistantFooter:
@@ -3053,7 +3053,7 @@ extension CollectionViewMessageListV3 {
                 // which does not change when a block is appended, so the diff is
                 // empty for it and UIKit never re-configures the cell (same
                 // mechanism as gap 1 in cd50865c). The footer therefore keeps the
-                // TALLER height it measured while "Minis is thinking…" was
+                // TALLER height it measured while "Fin is thinking…" was
                 // showing, and once the first tool block lands the indicator
                 // disappears but the reserved space does not — the blank strip
                 // above the tool row that the user reported. It healed only on
@@ -3150,7 +3150,7 @@ extension CollectionViewMessageListV3 {
         /// calling attachmentBounds() during layout, unlike boundingRect() which
         /// uses the attachment's 1×1px placeholder image.
         /// [T-ios-decel-inv-estimate-calibration] Measure with the REAL render
-        /// engine: an offscreen SelectableMarkdownTextView (MinisLayoutManager +
+        /// engine: an offscreen SelectableMarkdownTextView (FinLayoutManager +
         /// 4/4 textContainerInset), exactly what the live cell hosts. The
         /// previous bare-NSLayoutManager measure drifted +4..+21pt on ~30% of
         /// blocks (multi-paragraph / emoji-heading content) — debug.measureCompare

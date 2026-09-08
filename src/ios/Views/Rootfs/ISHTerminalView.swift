@@ -1,6 +1,6 @@
 //
 //  ISHTerminalView.swift
-//  MinisApp
+//  FinApp
 //
 //  Terminal view for iSH shell interaction
 //
@@ -93,7 +93,7 @@ struct ISHTerminalView: View {
             )
         }
         .background(Color.black)
-        .navigationTitle("Minis Shell")
+        .navigationTitle("Fin Shell")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if showCloseButton {

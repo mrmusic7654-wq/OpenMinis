@@ -1,6 +1,6 @@
 //
 //  HealthKitOffload.h
-//  MinisApp
+//  FinApp
 //
 //  Native offload handler for `apple-healthkit` — HealthKit queries.
 //

@@ -1,6 +1,6 @@
 //
 //  SpeakOffload.h
-//  MinisApp
+//  FinApp
 //
 //  Native offload handler for `apple-speak` — AVSpeechSynthesizer.
 //

@@ -1,6 +1,6 @@
 //
 //  MountedFolderCoordinator.swift
-//  MinisApp
+//  FinApp
 //
 //  Thin wrapper around NSFileCoordinator + FileManager for user-mounted
 //  external folders (see MountedFoldersManager). When a path descends into

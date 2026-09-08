@@ -1,6 +1,6 @@
 //
 //  MCPStore.swift
-//  MinisApp
+//  FinApp
 //
 //  Manages MCP (Model Context Protocol) server configurations: CRUD, JSON
 //  import, per-session overrides, and Top-20 system-prompt injection.
@@ -52,7 +52,7 @@ struct MCPServerConfig: Codable, Identifiable, Hashable {
     var args: [String]?
     var env: [String: String]?
     /// Per-server startup/handshake timeout in seconds for a STDIO server's
-    /// first MCP `initialize` (Minis config, not MCP protocol). Enforcement
+    /// first MCP `initialize` (Fin config, not MCP protocol). Enforcement
     /// lives entirely in the in-guest `minis-mcp-cli` daemon; the native layer
     /// only round-trips the field so an edit/import/export never drops it.
     /// Optional: absent means the daemon default (60s). [T-mcp-startup-timeout]
@@ -262,7 +262,7 @@ final class MCPStore: ObservableObject {
         var command: String?
         var args: [String]?
         var env: [String: String]?
-        var startupTimeoutSeconds: Int?   // Minis STDIO startup timeout; round-tripped verbatim
+        var startupTimeoutSeconds: Int?   // Fin STDIO startup timeout; round-tripped verbatim
     }
 
     func load() {

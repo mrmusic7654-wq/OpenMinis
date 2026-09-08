@@ -611,7 +611,7 @@ enum ThinkingRuleResolver {
         case .extraBodyToggle(let path):
             // Same shape, but conventionally nested under extra_body. Kept as its own case
             // because that is how users think about it (GH OpenMinis#171: DeepSeek's real
-            // switch is extra_body.thinking.enabled and Minis never sent it).
+            // switch is extra_body.thinking.enabled and Fin never sent it).
             setValue(true, at: path, in: &body, when: ctx.level.isEnabled, otherwiseWrite: false)
             return (nil, nil)
 

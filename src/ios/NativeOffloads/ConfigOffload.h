@@ -1,6 +1,6 @@
 //
 //  ConfigOffload.h
-//  MinisApp
+//  FinApp
 //
 //  Native offload handler for `minis-config` — read and change app
 //  settings via the ConfigRegistry.

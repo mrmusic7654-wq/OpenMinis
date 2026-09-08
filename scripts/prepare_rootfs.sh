@@ -268,7 +268,7 @@ EOF
  | |  | | | | | | \__ \   \ V / | |  | |
  |_|  |_|_|_| |_|_|___/    \_/  |_|  |_|
 
- Welcome to MinisApp Alpine Linux VM
+ Welcome to FinApp Alpine Linux VM
  Running on QEMU aarch64
 
 EOF
@@ -347,7 +347,7 @@ main() {
     log_info "To test the VM locally:"
     log_info "  cd $ALPINE_DIR && ./qemu-boot.sh"
     echo
-    log_info "To use in MinisApp:"
+    log_info "To use in FinApp:"
     log_info "  Copy alpine-aarch64.qcow2 to the app bundle or download at runtime"
 }
 

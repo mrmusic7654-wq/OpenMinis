@@ -1,6 +1,6 @@
 //
 //  ISHKernel.h
-//  MinisApp
+//  FinApp
 //
 //  Objective-C wrapper for iSH kernel initialization and control
 //

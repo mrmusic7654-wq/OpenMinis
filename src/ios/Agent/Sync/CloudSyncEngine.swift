@@ -76,7 +76,7 @@ final class SyncLogStore: ObservableObject {
     /// message content is never included. Safe for sharing with developers.
     func exportSanitizedReport() -> String {
         var lines: [String] = []
-        lines.append("=== MinisApp iCloud Sync Diagnostic Log ===")
+        lines.append("=== FinApp iCloud Sync Diagnostic Log ===")
         lines.append("Exported: \(ISO8601DateFormatter().string(from: Date()))")
         lines.append("Entries: \(entries.count)")
         lines.append("")
@@ -225,7 +225,7 @@ final class PendingRecordChanges: @unchecked Sendable {
 final class CloudSyncEngine: ObservableObject {
     static let shared = CloudSyncEngine()
 
-    private lazy var container = CKContainer(identifier: "iCloud.com.openminis.app")
+    private lazy var container = CKContainer(identifier: "iCloud.com.mrmusic.fin")
     private let devicesZoneName = "devices"
 
     private var syncEngine: CKSyncEngine?

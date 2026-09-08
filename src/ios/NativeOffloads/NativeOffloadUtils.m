@@ -1,6 +1,6 @@
 //
 //  NativeOffloadUtils.m
-//  MinisApp
+//  FinApp
 //
 //  Shared utilities for native offload CLI tools.
 //

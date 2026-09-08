@@ -1,6 +1,6 @@
 //
 //  AttributeQueryRecorder.h
-//  Minis
+//  Fin
 //
 //  Swizzle `-[NSConcreteMutableAttributedString attribute:atIndex:effectiveRange:]`
 //  (and the corresponding NSAttributedString/NSMutableAttributedString class

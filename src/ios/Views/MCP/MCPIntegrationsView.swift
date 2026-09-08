@@ -1,6 +1,6 @@
 //
 //  MCPIntegrationsView.swift
-//  MinisApp
+//  FinApp
 //
 //  Management screen for MCP (Model Context Protocol) servers. Mirrors
 //  SkillsManagementView: a list of servers with status dot + name + transport,

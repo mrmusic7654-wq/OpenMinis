@@ -1,6 +1,6 @@
 //
 //  TerminalEmulator.swift
-//  MinisApp
+//  FinApp
 //
 //  Core terminal emulator: connects ANSIParser → TerminalBuffer, handles all sequences
 //

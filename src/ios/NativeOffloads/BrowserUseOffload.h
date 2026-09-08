@@ -1,6 +1,6 @@
 //
 //  BrowserUseOffload.h
-//  MinisApp
+//  FinApp
 //
 
 #ifndef BrowserUseOffload_h

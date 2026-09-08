@@ -133,7 +133,7 @@ cd OpenMinis
 # iOS  — order matters: FFmpeg links against LAME
 ./deps/build_lame.sh && ./deps/build_ffmpeg.sh
 ./deps/build_ish.sh && ./deps/prepare_alpine_rootfs.sh
-open src/ios/Minis.xcodeproj
+open src/ios/Fin.xcodeproj
 
 # Android — needs NDK r28+
 ./deps/build_proot.sh && ./scripts/prepare_android_sandbox.sh
