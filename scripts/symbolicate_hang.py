@@ -9,7 +9,7 @@ Usage:
     # From a saved JSON dump (the full RPC response or just the events array).
     scripts/symbolicate_hang.py path/to/dump.json
 
-Resolves Minis frames to source-line via `atos` against the most recent
+Resolves Fin frames to source-line via `atos` against the most recent
 matching dSYM under ~/Library/Developer/Xcode/Archives. Other-image frames
 (UIKitCore, SwiftUI, CoreFoundation, …) are passed through as-is — Apple
 private framework symbols aren't usually present locally.
@@ -45,15 +45,15 @@ def _eprint(*args: Any, **kwargs: Any) -> None:
 
 
 def _find_minis_dsym(prefer_archive_after: datetime | None = None) -> Path | None:
-    """Return the most recent Minis.app.dSYM."""
+    """Return the most recent Fin.app.dSYM."""
     candidates: list[tuple[datetime, Path]] = []
     if not ARCHIVES_ROOT.exists():
         return None
     for date_dir in ARCHIVES_ROOT.iterdir():
         if not date_dir.is_dir():
             continue
-        for archive in date_dir.glob("Minis*.xcarchive"):
-            dsym = archive / "dSYMs" / "Minis.app.dSYM"
+        for archive in date_dir.glob("Fin*.xcarchive"):
+            dsym = archive / "dSYMs" / "Fin.app.dSYM"
             if dsym.exists():
                 mtime = datetime.fromtimestamp(archive.stat().st_mtime)
                 candidates.append((mtime, dsym))
@@ -69,7 +69,7 @@ def _atos_batch(
     """Resolve a batch of addresses (PC values) to symbol strings."""
     if not addresses:
         return []
-    binary = dsym / "Contents/Resources/DWARF/Minis"
+    binary = dsym / "Contents/Resources/DWARF/Fin"
     if not binary.exists():
         return [f"<dSYM binary missing: {binary}>"] * len(addresses)
     cmd = [
@@ -99,11 +99,11 @@ def _symbolicate_event(event: dict[str, Any], dsym: Path | None) -> str:
 
     out = [f"=== Hang @ {when}  duration={duration:.0f}ms  activity=0x{activity:x}  depth={len(frames)} ==="]
 
-    # Group Minis frames for batch atos call.
+    # Group Fin frames for batch atos call.
     minis_idx: list[int] = []
     minis_offsets: list[int] = []
     for i, frame in enumerate(frames):
-        if frame.get("image") == "Minis":
+        if frame.get("image") == "Fin":
             off_str = frame.get("offset", "0x0")
             try:
                 off = int(off_str, 16)
@@ -124,7 +124,7 @@ def _symbolicate_event(event: dict[str, Any], dsym: Path | None) -> str:
         addr = frame.get("address", "0x0")
         symbol = frame.get("symbol")
         line = f"  #{i:<2} {image} + {offset}"
-        if image == "Minis" and i in minis_resolved:
+        if image == "Fin" and i in minis_resolved:
             line += f"\n      {minis_resolved[i]}"
         elif symbol:
             line += f"\n      {symbol}  (raw addr {addr})"
@@ -207,8 +207,8 @@ def main() -> int:
     else:
         dsym = _find_minis_dsym()
         if dsym is None:
-            _eprint("WARN: no Minis.app.dSYM found under ~/Library/Developer/Xcode/Archives;")
-            _eprint("      Minis frames will not be symbolicated.")
+            _eprint("WARN: no Fin.app.dSYM found under ~/Library/Developer/Xcode/Archives;")
+            _eprint("      Fin frames will not be symbolicated.")
 
     if dsym:
         _eprint(f"using dSYM: {dsym}")

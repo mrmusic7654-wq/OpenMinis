@@ -1,6 +1,6 @@
 //
 //  ConfigOffloadBridge.swift
-//  MinisApp
+//  FinApp
 //
 //  Swift bridge for `minis-config`.
 //  All registry / gate / audit logic lives here; the .m handler just

@@ -5,7 +5,7 @@ import Foundation
 /// keyed by topic; topic names line up with the CLI subcommands.
 ///
 /// Registration is idempotent and runs once at app launch from
-/// `MinisApp.onAppear` via `ConfigRegistry.shared.registerBuiltinsIfNeeded()`.
+/// `FinApp.onAppear` via `ConfigRegistry.shared.registerBuiltinsIfNeeded()`.
 extension ConfigRegistry {
     @MainActor
     static func registerBuiltins(into r: ConfigRegistry) {
@@ -699,7 +699,7 @@ extension ConfigRegistry {
     /// [GH#101] Not simply `SyncV2Bootstrap.isEnabled`: `shouldPauseV1()`
     /// deliberately keeps v1 alive when a v2 migration has FAILED, so a user in
     /// that state is really running v1 and must not be shown v2's flags. This
-    /// mirrors the exact condition MinisApp uses to decide which engine to boot.
+    /// mirrors the exact condition FinApp uses to decide which engine to boot.
     @MainActor
     private static func syncV2Live() -> Bool {
         guard #available(iOS 17.0, *) else { return false }
@@ -747,7 +747,7 @@ extension ConfigRegistry {
         // "current"; they described different subsystems.
         //
         // The fields now mirror whichever engine is actually live. v1 is NOT
-        // dead code: MinisApp starts it when v2 is off, and `shouldPauseV1()`
+        // dead code: FinApp starts it when v2 is off, and `shouldPauseV1()`
         // deliberately lets it keep running when a v2 migration has failed, so
         // reading v2 unconditionally would misreport state for those users.
         // `syncV2Live` is the single predicate both the reader and writer use.
@@ -940,6 +940,18 @@ extension ConfigRegistry {
             userDefaultsKey: "appearanceMode",
             cases: ["system", "light", "dark"],
             defaultIndex: 0
+        ))
+        // [T-app-themes] Visual theme. Orthogonal to `appearance.theme`: every
+        // theme has a light and a dark rendition. Writes land in UserDefaults
+        // and ThemeManager picks them up via didChangeNotification, so the
+        // agent flipping this re-themes the running UI just like the picker.
+        r.register(AppStorageEnumField(
+            path: "appearance.app_theme",
+            displayName: "Visual theme",
+            description: "Colour theme for the whole app (accent, surfaces, bubbles). Each theme has a light and a dark look; light/dark itself is `appearance.theme`.",
+            userDefaultsKey: AppTheme.storageKey,
+            cases: AppTheme.ids,
+            defaultValue: AppTheme.default.rawValue
         ))
         r.register(AppStorageIntCodedEnumField(
             path: "appearance.appIcon",

@@ -35,14 +35,14 @@ func percentEncodePathSegmentIdempotent(_ seg: String) -> String {
     return decoded.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? seg
 }
 
-// MARK: - MinisToast
+// MARK: - FinToast
 
 /// [T-toast-feedback] Lightweight, self-dismissing toast for one-shot action
 /// feedback ("Saved", "Table copied", …). Window-level so it works from both
 /// SwiftUI screens and UIKit views (e.g. the markdown table copy actions,
 /// which run in a UILabel subclass with no SwiftUI context). Mirrors the
 /// capsule style FileBrowserView already uses for its "Copied" toast.
-enum MinisToast {
+enum FinToast {
     /// Show a toast with an already-localized message. Safe from any thread.
     /// `systemImage` sets the leading icon (default: success checkmark); pass an
     /// error glyph like "exclamationmark.triangle.fill" for failures.
@@ -385,7 +385,7 @@ fileprivate final class MarkdownNSRenderer {
     /// every TableAttachment was rebuilt and its `cachedLayout` reset to
     /// nil — forcing typesetter to run a full per-cell `boundingRect`
     /// pass on each `attachmentBounds` query. On a 6-table message that
-    /// was 27 s of main-thread typesetter pin (ips Minis-2026-05-14-094312).
+    /// was 27 s of main-thread typesetter pin (ips Fin-2026-05-14-094312).
     /// Keying by contentHash lets re-rendered identical tables hit the
     /// previously-built attachment + its `cachedLayout`.
     var tableAttachmentCache: [Int: TableAttachment] = [:]
@@ -680,7 +680,7 @@ fileprivate final class MarkdownNSRenderer {
         // Bullet glyphs MUST be Unicode characters, NOT NSTextAttachments.
         // Build 13 reverted bullets to SF-symbol NSTextAttachments per
         // user request to restore visual size — within 90s of install the
-        // device hit a fresh 0x8BADF00D watchdog (ips Minis-2026-05-14-
+        // device hit a fresh 0x8BADF00D watchdog (ips Fin-2026-05-14-
         // 163330). Main-thread frame #1: `NSConcreteTextStorage
         // attribute:atIndex:effectiveRange:` — fillLayoutHole scanning
         // attribute runs. A 6-item list produces 6 image-attachment runs;
@@ -1139,7 +1139,7 @@ fileprivate final class MarkdownNSRenderer {
             codeAttrs[.foregroundColor] = theme.inlineCodeColor
             codeAttrs[.inlineCodeBackground] = true
             codeAttrs[.inlineCodeText] = code
-            // Set .backgroundColor to trigger fillBackgroundRectArray in MinisLayoutManager
+            // Set .backgroundColor to trigger fillBackgroundRectArray in FinLayoutManager
             // The actual color is drawn there with rounded corners; this just triggers the callback.
             codeAttrs[.backgroundColor] = theme.inlineCodeBackground
             // Add hair spaces for visual padding inside the background highlight.
@@ -2137,7 +2137,7 @@ final class TableAttachment: NSTextAttachment {
             // and the standard `.backgroundColor` (the rect range the painter
             // keys off). Two cell render paths consume this:
             //   - Link cells -> TableCellTextView, now backed by a
-            //     MinisLayoutManager whose fillBackgroundRectArray draws the
+            //     FinLayoutManager whose fillBackgroundRectArray draws the
             //     same rounded rect as body inline code (theme.inlineCodeCornerRadius=5).
             //   - Link-inert cells -> TableCellLabel, which has no layout
             //     manager; it strips `.backgroundColor` (to avoid the square
@@ -2281,7 +2281,7 @@ final class TableAttachment: NSTextAttachment {
             guard let self else { return }
             UIPasteboard.general.string = self.plainText()
             // [T-toast-feedback] Confirm the copy succeeded.
-            MinisToast.show(String(localized: "Table copied"))
+            FinToast.show(String(localized: "Table copied"))
         }
 
         // [T-ios-copy-table-image] Render the FULL table (all rows/cols, not
@@ -2339,7 +2339,7 @@ final class TableAttachment: NSTextAttachment {
             }
             UIPasteboard.general.image = image
             // [T-toast-feedback] Confirm the image copy succeeded.
-            MinisToast.show(String(localized: "Table image copied"))
+            FinToast.show(String(localized: "Table image copied"))
         }
 
         var yOffset: CGFloat = 0
@@ -2630,13 +2630,13 @@ private final class TableCellTextView: UITextView, UITextViewDelegate {
     }
 
     /// [T-ios-table-inline-code-rounded] TextKit1 stack backed by a
-    /// MinisLayoutManager so inline-code spans (marked with
+    /// FinLayoutManager so inline-code spans (marked with
     /// `.inlineCodeBackground`) draw the same rounded background as body
     /// inline code via fillBackgroundRectArray. The default UITextView layout
     /// manager only paints square `.backgroundColor`.
     convenience init() {
         let textStorage = NSTextStorage()
-        let layoutManager = MinisLayoutManager()
+        let layoutManager = FinLayoutManager()
         let textContainer = NSTextContainer()
         textContainer.lineFragmentPadding = 0
         textContainer.widthTracksTextView = true
@@ -2895,7 +2895,7 @@ private final class TableCellLabel: UILabel, UIGestureRecognizerDelegate, UICont
     // `.backgroundColor` from the displayed text (keeping `.inlineCodeBackground`
     // as the range marker) and paint rounded rects ourselves in drawText.
     // `selectableAttributedText` is left untouched — the promoted UITextView
-    // keeps `.backgroundColor` so its MinisLayoutManager painter still fires.
+    // keeps `.backgroundColor` so its FinLayoutManager painter still fires.
 
     override var attributedText: NSAttributedString? {
         get { super.attributedText }
@@ -4461,12 +4461,12 @@ private extension Array where Element == InlineNode {
     }
 }
 
-// MARK: - MinisLayoutManager
+// MARK: - FinLayoutManager
 
 /// Custom NSLayoutManager subclass. Originally added for inline-code rounded
 /// background rendering (see `fillBackgroundRectArray` below). Kept as a
 /// dedicated class so other layout-manager hooks can be added in one place.
-final class MinisLayoutManager: NSLayoutManager {
+final class FinLayoutManager: NSLayoutManager {
 
     override func fillBackgroundRectArray(_ rectArray: UnsafePointer<CGRect>, count rectCount: Int, forCharacterRange charRange: NSRange, color: UIColor) {
         // Check if this range has inline code background
@@ -4757,7 +4757,7 @@ final class SelectableMarkdownTextView: UITextView, UIGestureRecognizerDelegate 
     init() {
         // Use TextKit 1 for reliable NSLayoutManager overrides
         let textStorage = NSTextStorage()
-        let layoutManager = MinisLayoutManager()
+        let layoutManager = FinLayoutManager()
         let textContainer = NSTextContainer()
         textContainer.lineFragmentPadding = 0
         textContainer.widthTracksTextView = true
@@ -5281,13 +5281,13 @@ final class SelectableMarkdownTextView: UITextView, UIGestureRecognizerDelegate 
         onCopyScreenshot?()
     }
 
-    // MARK: - [T-selection-menu-minis-tts] Minis TTS menu actions
+    // MARK: - [T-selection-menu-minis-tts] Fin TTS menu actions
 
-    /// Read the WHOLE reply from the start via the Minis TTS stack
+    /// Read the WHOLE reply from the start via the Fin TTS stack
     /// (vm.readReplyFromStart). Plumbed from the cell bridge; nil while the
     /// reply is still streaming (would clash with live streaming TTS).
     var onReadAloud: (() -> Void)?
-    /// Speak an arbitrary text snippet via the Minis TTS stack (vm.speakText).
+    /// Speak an arbitrary text snippet via the Fin TTS stack (vm.speakText).
     var onSpeakText: ((String) -> Void)?
 
     @objc func readReplyFromMenu(_ sender: Any?) {
@@ -5350,7 +5350,7 @@ final class SelectableMarkdownTextView: UITextView, UIGestureRecognizerDelegate 
     override func buildMenu(with builder: UIMenuBuilder) {
         super.buildMenu(with: builder)
         // [T-selection-menu-minis-tts] Remove the SYSTEM speech menu ("Speak…"
-        // / "Spell") — it reads with the OS voice, bypassing the Minis TTS
+        // / "Spell") — it reads with the OS voice, bypassing the Fin TTS
         // stack (provider voices, sanitizer, fail-over). Replaced below with
         // our own Read Selection / Read Reply entries.
         builder.remove(menu: .speech)
@@ -5372,7 +5372,7 @@ final class SelectableMarkdownTextView: UITextView, UIGestureRecognizerDelegate 
                 action: #selector(copyScreenshotFromMenu(_:))
             ))
         }
-        // [T-selection-menu-minis-tts] Minis-owned read-aloud entries. "Read
+        // [T-selection-menu-minis-tts] Fin-owned read-aloud entries. "Read
         // Selection" speaks just the selected range; "Read from Start" replays
         // the whole reply — both through the in-app TTS stack.
         // Matching speaker glyph family so the two read-aloud entries read as
@@ -5650,7 +5650,7 @@ final class SelectableMarkdownTextView: UITextView, UIGestureRecognizerDelegate 
         var reusedIds: Set<ObjectIdentifier> = []
 
         guard let textStorage = self.textStorage as? NSTextStorage,
-              let layoutManager = self.layoutManager as? MinisLayoutManager else {
+              let layoutManager = self.layoutManager as? FinLayoutManager else {
             for view in attachmentViews { view.removeFromSuperview() }
             attachmentViews.removeAll()
             attachmentViewMap.removeAll()
@@ -6056,7 +6056,7 @@ final class SelectableMarkdownTextView: UITextView, UIGestureRecognizerDelegate 
         // cell to grow before the typesetter can fit the new layout.
         //
         // (a) invalidate the layout so ensureLayout will re-typeset.
-        if let layoutManager = self.layoutManager as? MinisLayoutManager,
+        if let layoutManager = self.layoutManager as? FinLayoutManager,
            let textStorage = self.textStorage as? NSTextStorage {
             let full = NSRange(location: 0, length: textStorage.length)
             layoutManager.invalidateLayout(forCharacterRange: full, actualCharacterRange: nil)
@@ -6314,7 +6314,7 @@ final class SelectableMarkdownTextView: UITextView, UIGestureRecognizerDelegate 
         // is identical, because UIKit doesn't equality-check size on
         // NSTextContainer. In the BoundsChangeFading path that's the
         // recursion seed for the watchdog hang seen in
-        // Minis-2026-05-13-084827.ips: every layout pass re-triggers a full
+        // Fin-2026-05-13-084827.ips: every layout pass re-triggers a full
         // fillLayoutHole on tables, which calls back into attachmentBounds,
         // which re-enters typesetting.
         if textContainer.size.height < CGFloat.greatestFiniteMagnitude {
@@ -6359,7 +6359,7 @@ final class SelectableMarkdownTextView: UITextView, UIGestureRecognizerDelegate 
                         ranges.append(range)
                     }
                 }
-                if !ranges.isEmpty, let lm = self.layoutManager as? MinisLayoutManager {
+                if !ranges.isEmpty, let lm = self.layoutManager as? FinLayoutManager {
                     for r in ranges {
                         lm.invalidateLayout(forCharacterRange: r, actualCharacterRange: nil)
                     }
@@ -6389,7 +6389,7 @@ final class SelectableMarkdownTextView: UITextView, UIGestureRecognizerDelegate 
         // first-load case where updateAttachmentViews() runs before sizeThatFits
         // has set the correct textContainer size.
         guard !attachmentViews.isEmpty,
-              let layoutManager = self.layoutManager as? MinisLayoutManager,
+              let layoutManager = self.layoutManager as? FinLayoutManager,
               let textStorage = self.textStorage as? NSTextStorage else { return }
         let fullRange = NSRange(location: 0, length: textStorage.length)
 
@@ -6869,7 +6869,7 @@ final class SelectableMarkdownTextView: UITextView, UIGestureRecognizerDelegate 
     private func drawBlockquoteBars(in rect: CGRect) {
         guard let context = UIGraphicsGetCurrentContext(),
               let textStorage = self.textStorage as? NSTextStorage,
-              let layoutManager = self.layoutManager as? MinisLayoutManager else { return }
+              let layoutManager = self.layoutManager as? FinLayoutManager else { return }
 
         let theme = SelectableMarkdownTheme()
         let fullRange = NSRange(location: 0, length: textStorage.length)
@@ -6976,9 +6976,9 @@ struct SelectableMarkdownView: UIViewRepresentable {
     var onTapBlank: ((CGPoint) -> Void)?
     /// Called when the user picks "Copy Screenshot" from the text selection menu.
     var onCopyScreenshot: (() -> Void)?
-    /// [T-selection-menu-minis-tts] "Read from Start" (whole reply) via Minis TTS.
+    /// [T-selection-menu-minis-tts] "Read from Start" (whole reply) via Fin TTS.
     var onReadAloud: (() -> Void)?
-    /// [T-selection-menu-minis-tts] "Read Selection" (selected text) via Minis TTS.
+    /// [T-selection-menu-minis-tts] "Read Selection" (selected text) via Fin TTS.
     var onSpeakText: ((String) -> Void)?
     @Environment(\.openURL) private var openURL
 
@@ -7083,7 +7083,7 @@ struct SelectableMarkdownView: UIViewRepresentable {
                         ranges.append(range)
                     }
                 }
-                if !ranges.isEmpty, let lm = textView.layoutManager as? MinisLayoutManager {
+                if !ranges.isEmpty, let lm = textView.layoutManager as? FinLayoutManager {
                     for r in ranges {
                         lm.invalidateLayout(forCharacterRange: r, actualCharacterRange: nil)
                     }
@@ -7826,7 +7826,7 @@ struct SelectableMarkdownView: UIViewRepresentable {
         // fixed-height attachments (tool capsules, code/shell blocks, images):
         // those blocks don't grow with character count, so the estimate came
         // out too short and the NEXT cell overlapped the tail of a finished
-        // message (user report, macOS, "Minis Feedback Review" — the shell
+        // message (user report, macOS, "Fin Feedback Review" — the shell
         // preview + tool capsule covered the body text of the last message).
         // Gate it back off so every streaming sizeThatFits takes a real
         // measurement; the hang de4d3df6 fixed is the tradeoff to revisit with
@@ -7871,7 +7871,7 @@ struct SelectableMarkdownView: UIViewRepresentable {
         // `addSubview` / `setNeedsLayout` on the live textView during
         // SwiftUI's measurement pass, which causes SwiftUI to re-invoke
         // `sizeThatFits` recursively. The resulting watchdog hang is
-        // recorded in `Minis-2026-05-13-084827.ips` (depth=9 recursion at
+        // recorded in `Fin-2026-05-13-084827.ips` (depth=9 recursion at
         // `LayoutEngineBox.sizeThatFits`). Measuring on a detached textView
         // keeps the live view's state stable until the subsequent
         // `updateUIView` runs.
@@ -8440,7 +8440,7 @@ struct SelectableMarkdownView: UIViewRepresentable {
         /// attributedText that hasn't been committed to the on-screen
         /// textView yet. Writing pending text into the live `uiView` from
         /// inside `sizeThatFits` is what caused the watchdog hang seen in
-        /// `Minis-2026-05-13-084827.ips`: it rebuilds attachment subviews
+        /// `Fin-2026-05-13-084827.ips`: it rebuilds attachment subviews
         /// and calls `addSubview` → `setNeedsLayout` on the textView
         /// during SwiftUI's measurement pass, which then triggers SwiftUI
         /// to re-invoke `sizeThatFits` indefinitely.
@@ -8588,7 +8588,7 @@ struct SelectableMarkdownView: UIViewRepresentable {
     }
 }
 
-// MARK: - Minis URL Resolution (bridged from AIChatView)
+// MARK: - Fin URL Resolution (bridged from AIChatView)
 
 /// Resolves a `minis://` URL to a local file URL.
 /// Keeps resolution behavior aligned with AIChatView's minis resolver.

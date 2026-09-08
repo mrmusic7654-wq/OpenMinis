@@ -1,6 +1,6 @@
-# Building Minis
+# Building Fin
 
-Minis ships a full Linux sandbox inside the app, so a first build is not just
+Fin ships a full Linux sandbox inside the app, so a first build is not just
 "open the project and press Run": the native dependencies (iSH on iOS, PRoot on
 Android, FFmpeg, LAME) and the Alpine rootfs are **built from source by the
 scripts in `deps/`**, not committed as binaries. Budget ~30–60 minutes for the
@@ -113,17 +113,17 @@ by hand.
 ### 2. Build the app
 
 ```sh
-open src/ios/Minis.xcodeproj
+open src/ios/Fin.xcodeproj
 ```
 
-Select the **Minis** scheme and build. For a device build, set your own team
+Select the **Fin** scheme and build. For a device build, set your own team
 under *Signing & Capabilities* — the project ships with an empty
 `DEVELOPMENT_TEAM`.
 
 From the command line:
 
 ```sh
-xcodebuild -project src/ios/Minis.xcodeproj -scheme Minis \
+xcodebuild -project src/ios/Fin.xcodeproj -scheme Fin \
            -configuration Debug -destination 'generic/platform=iOS' \
            CODE_SIGNING_ALLOWED=NO build
 ```
@@ -136,8 +136,8 @@ xcodebuild -project src/ios/Minis.xcodeproj -scheme Minis \
 
 ### Targets
 
-`Minis` (app), `MinisShare` (share extension), `AgentWidgetExtension`,
-`MinisFileProvider`, plus `MinisTests` / `MinisUITests`.
+`Fin` (app), `FinShare` (share extension), `AgentWidgetExtension`,
+`FinFileProvider`, plus `FinTests` / `FinUITests`.
 
 ---
 
@@ -149,7 +149,7 @@ xcodebuild -project src/ios/Minis.xcodeproj -scheme Minis \
 |---|---|
 | JDK | **17** (`sourceCompatibility`/`targetCompatibility` are 17) |
 | Android SDK | **compileSdk 36**, targetSdk 35, **minSdk 26** |
-| Android NDK | **r28+** — set `$ANDROID_NDK_HOME`, or install via Android Studio |
+| Android NDK | **r28 — `28.2.13676358`** (pinned via `ndkVersion` in `app/build.gradle.kts`; install it through the SDK Manager and point `$ANDROID_NDK_HOME` at it for `build_proot.sh`) |
 | CMake | 3.22.1 (install through the SDK Manager) |
 | Shell tools | `curl`, `tar`, `make`, `awk`, `sed` |
 
@@ -213,6 +213,32 @@ required to produce one locally.
 ./gradlew :app:connectedAndroidTest     # instrumented; needs a device/emulator
 ```
 
+### Continuous integration
+
+[`.github/workflows/android.yml`](.github/workflows/android.yml) runs the exact
+sequence above on a GitHub-hosted `ubuntu-24.04` runner — `build_proot.sh`,
+`prepare_android_sandbox.sh`, `:app:assembleDebug`, `:app:testDebugUnitTest` —
+for every push and pull request that touches the Android build (`src/android`,
+`src/shared`, the proot submodule and the two scripts). The debug APK is
+published as a workflow artifact named `Fin-<version>-debug-<sha>.apk`;
+[`.github/scripts/stage_apk.sh`](.github/scripts/stage_apk.sh) refuses to
+publish an APK that is missing the proot binary, the loaders or the Alpine
+rootfs, so a green run means the sandbox is really inside the package.
+
+The unit-test step is currently **non-blocking**: the public mirror inherits a
+set of tests that cannot pass here (`AnthropicProviderTest` needs the private
+`ANTHROPIC_OAUTH_IDENTIFIER_PROMPT`, `OpenAIProviderTest` fixtures predate the
+empty-stream guard, and four `TerminalSanitizerTest` CR-folding cases fail on
+`main` too). Results are summarised on the run page and the HTML report is
+attached as the `unit-test-reports` artifact; remove `continue-on-error` from
+the step once those are fixed.
+
+Run it by hand from the **Actions → Android APK → Run workflow** button; tick
+*build_release* to additionally get the R8-minified `Fin-<version>-release-<sha>.apk`
+(still signed with the debug key — no secrets are involved). The NDK and CMake
+versions the workflow installs are read from `app/build.gradle.kts`, so bumping
+them there is the only change needed.
+
 ---
 
 ## Troubleshooting
@@ -230,9 +256,9 @@ the simulator note above.
 **iOS: MP3 encoding unavailable** — `build_lame.sh` did not run before
 `build_ffmpeg.sh`. Rerun both in order.
 
-**Android: `Android NDK not found`** — set `ANDROID_NDK_HOME` to your NDK r28+
-installation, e.g.
-`export ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/28.0.12433566`.
+**Android: `Android NDK not found`** — set `ANDROID_NDK_HOME` to the NDK
+release pinned in `app/build.gradle.kts`, e.g.
+`export ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/28.2.13676358`.
 
 **Android: app starts but the shell does not** — the sandbox assets are
 missing. Rerun `./deps/build_proot.sh` and
@@ -260,7 +286,7 @@ from the customization file; see [Build-time customization](#build-time-customiz
 
 ## Licensing note
 
-Minis is **GPLv3** because it links iSH (GPLv3) and PRoot (GPLv2). If you
+Fin is **GPLv3** because it links iSH (GPLv3) and PRoot (GPLv2). If you
 change how the native dependencies are built, keep FFmpeg on its LGPL
 configuration and preserve the vendored `LICENSE` files. See
 [LICENSE](LICENSE) and [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).

@@ -1,6 +1,6 @@
 //
 //  BrowserUseOffload.m
-//  MinisApp
+//  FinApp
 //
 //  Native offload handler for `minis-browser-use`.
 //  Exposes the in-app browser_use tool (WKWebView automation) as a CLI
@@ -16,10 +16,10 @@
 #include <unistd.h>
 
 // Swift bridge — generated header
-#if __has_include("Minis-Swift.h")
-#import "Minis-Swift.h"
-#elif __has_include("MinisApp-Swift.h")
-#import "MinisApp-Swift.h"
+#if __has_include("Fin-Swift.h")
+#import "Fin-Swift.h"
+#elif __has_include("FinApp-Swift.h")
+#import "FinApp-Swift.h"
 #endif
 
 static NSString *const TOOL_NAME = @"minis-browser-use";

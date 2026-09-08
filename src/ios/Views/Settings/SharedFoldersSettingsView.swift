@@ -1,11 +1,11 @@
 //
 //  SharedFoldersSettingsView.swift
-//  MinisApp
+//  FinApp
 //
 //  Settings screen that lists the three FileProvider-exposed shared directories
 //  (shared, skills, memory), lets the user tap each row to browse its contents,
 //  and toggles whether each one is visible in the iOS Files app under
-//  "On My iPhone → Minis".
+//  "On My iPhone → Fin".
 //
 
 import SwiftUI
@@ -20,7 +20,7 @@ struct SharedFoldersSettingsView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Label("Shared folders", systemImage: "info.circle")
                         .font(.subheadline.weight(.semibold))
-                    Text("These directories appear in iOS Files under On My iPhone → Minis. Tap a row to see details, browse, or toggle visibility.")
+                    Text("These directories appear in iOS Files under On My iPhone → Fin. Tap a row to see details, browse, or toggle visibility.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -147,7 +147,7 @@ struct SharedFolderEntry: Identifiable, Hashable {
     let iconColor: Color
     /// Whether the Files app (via FileProvider extension) can write to this
     /// folder. `memory` and `skills` are read-only from Files; `shared` is r/w.
-    /// Note: the MinisApp itself always reads/writes all three — this flag only
+    /// Note: the FinApp itself always reads/writes all three — this flag only
     /// describes the Files-app-facing surface.
     let isWritableFromFiles: Bool
 
@@ -224,7 +224,7 @@ final class SharedFoldersViewModel: ObservableObject {
     }
 
     private static func signalFileProviderRoot() {
-        let domainIdentifier = NSFileProviderDomainIdentifier("com.openminis.app.files")
+        let domainIdentifier = NSFileProviderDomainIdentifier("com.mrmusic.fin.files")
         NSFileProviderManager.getDomainsWithCompletionHandler { domains, _ in
             guard let domain = domains.first(where: { $0.identifier == domainIdentifier }) else {
                 return

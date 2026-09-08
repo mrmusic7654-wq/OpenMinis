@@ -1,6 +1,6 @@
 //
 //  FileMentionIndex.swift
-//  MinisApp
+//  FinApp
 //
 //  Backing index for the chat input's `@` file-mention feature.
 //  Layered scan (session → shared → mounts) with 10-minute cache and

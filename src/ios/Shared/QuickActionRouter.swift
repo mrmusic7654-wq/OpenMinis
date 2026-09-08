@@ -1,6 +1,6 @@
 //
 //  QuickActionRouter.swift
-//  MinisApp
+//  FinApp
 //
 //  Home-screen Quick Actions (long-press app icon → "New Chat",
 //  "Chat with Voice", "Chat with Camera").

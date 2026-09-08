@@ -1,6 +1,6 @@
 //
 //  AudioPlayback.swift
-//  MinisApp
+//  FinApp
 //
 //  Global audio player singleton + floating PiP capsule + inline audio
 //  bubble. Extracted from AIChatView.swift.

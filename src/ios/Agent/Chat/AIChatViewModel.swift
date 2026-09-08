@@ -299,7 +299,7 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
             // [T-deferred-sync-reload] If a send is in flight, don't
             // reload mid-stream — that would re-snapshot messages and
             // could clobber the streaming assistant block / hide the
-            // "Minis is thinking" indicator. Flip a flag instead; the
+            // "Fin is thinking" indicator. Flip a flag instead; the
             // $isProcessing observer below picks it up and replays one
             // reload as soon as the send completes. This avoids waiting
             // the full sync-timer cycle (~60s) for the next refresh.
@@ -1166,7 +1166,7 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
     /// for the [SuspendState] transition trace.
     private static func shortFrame(_ raw: String) -> String {
         // Raw frame looks like:
-        // "3   Minis   0x0000000104abcd12 $s5Minis... mangled ... + 40"
+        // "3   Fin   0x0000000104abcd12 $s3Fin... mangled ... + 40"
         // Prefer the human name after the mangled symbol if present, else the
         // whitespace-collapsed tail.
         let parts = raw.split(separator: " ", omittingEmptySubsequences: true)
@@ -1185,7 +1185,7 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
     /// A concurrent mutation on the outgoing vm here can cause
     /// AG::Subgraph::NodeCache::~NodeCache to deref a dangling pointer
     /// (FB13213926, recurring), evidenced by build-48 crash
-    /// Minis-2026-06-01-134710.ips: user switched sessions while both vms had
+    /// Fin-2026-06-01-134710.ips: user switched sessions while both vms had
     /// `isProcessing=true`, EXC_BAD_ACCESS in
     /// `_UIHostingView.isHiddenForReuse.setter → ViewGraphHost.updateRemovedState
     /// → AG::Subgraph::invalidate_now → AG::Subgraph::NodeCache::~NodeCache`.
@@ -1794,7 +1794,7 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
             // Hermes Agent's execution-discipline phrasing (act immediately instead
             // of describing intentions / keep working until complete / never end a
             // turn with a promise of future action), plus an HONEST off-ramp —
-            // Minis has no in-app scheduler (see 'Scheduled tasks'), so the only
+            // Fin has no in-app scheduler (see 'Scheduled tasks'), so the only
             // truthful alternatives are poll-now or tell-the-user-nothing-runs.
             + "Execution discipline for long-running or dispatched work: make tool calls immediately instead of describing intentions, and keep working until the task is complete. "
             + "Without a scheduler or timed-callback tool, `delay` is your ONLY wait mechanism within a turn — to follow up on something still running, chain delay-then-check calls at a task-appropriate interval until you have the result or hit a sensible retry cap. "
@@ -1850,7 +1850,7 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
             + "- shell_execute supports multi-line commands directly — quoting and special characters are handled automatically. "
             + "However, commands MUST NOT exceed 1000 characters. If longer, write a script file with file_write first, then run it.\n"
             + "- The default shell is BusyBox ash. `**` recursive glob (globstar) is not supported — use `find <dir> -name '*.ext'` for recursive search, piped to `xargs` for tools like `wc`. "
-            + "You do NOT need to hand-rewrite bash-specific syntax to POSIX: when a command uses bashisms (arrays arr=(...)/${arr[@]}, [[ ]], (( )), brace ranges {1..9}, process substitution, etc.), Minis automatically installs and runs it under bash. Write the script naturally in whichever shell dialect is clearest; only globstar has no automatic fallback.\n"
+            + "You do NOT need to hand-rewrite bash-specific syntax to POSIX: when a command uses bashisms (arrays arr=(...)/${arr[@]}, [[ ]], (( )), brace ranges {1..9}, process substitution, etc.), Fin automatically installs and runs it under bash. Write the script naturally in whichever shell dialect is clearest; only globstar has no automatic fallback.\n"
             + "- Python packages: many PyPI packages (numpy, pandas, scipy, pillow, etc.) lack musllinux_aarch64 wheels and will fail to build from source. "
             + "Use Alpine's native packages instead: `apk search py3-<name>` then `apk add py3-numpy py3-pandas py3-matplotlib py3-pillow py3-scipy py3-requests`. "
             + "Only fall back to `pip install` for pure-Python packages not available via apk. "
@@ -1877,12 +1877,12 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
             + "apple-player play <file> opens a native audio/video player and returns a session_id; use pause/resume/seek/status/stop to control playback. "
             + "apple-healthkit covers the full HealthKit catalog — 100+ quantity types (body, vitals, cardio fitness, mobility, sleep, audio exposure, nutrition, ...), 60+ category types (symptoms, reproductive, sleep, cardio events), characteristics (sex, DOB, blood type), and special samples (workouts, ECG, audiogram, vision-rx, GAD-7/PHQ-9, state-of-mind). Run `apple-healthkit types` to discover every supported metric with one-line descriptions, then use `apple-healthkit batch --types t1,t2,... --days N` to fetch MULTIPLE metrics in a single call (one authorization prompt, one envelope). Prefer batch over multiple per-metric calls. Use `log --type ... --value ...` to write samples.\n"
             + "apple-homekit controls HomeKit smart home devices. Use progressive disclosure: list (compact overview) → search --query/--type/--room (filter) → get --name (full detail with characteristics). set --name --characteristic --value to control devices. scenes lists scenes, trigger --name executes one.\n"
-            + "apple-alarm sets alarms and timers via AlarmKit (iOS 26+). Alarms can only be viewed in the Minis home screen (alarm icon in the top-right toolbar) or by opening minis://views/alarm. "
-            + "After setting an alarm, tell the user it is visible on the Minis home screen and they can tap the alarm icon or open minis://views/alarm to manage it.\n"
+            + "apple-alarm sets alarms and timers via AlarmKit (iOS 26+). Alarms can only be viewed in the Fin home screen (alarm icon in the top-right toolbar) or by opening minis://views/alarm. "
+            + "After setting an alarm, tell the user it is visible on the Fin home screen and they can tap the alarm icon or open minis://views/alarm to manage it.\n"
             + "apple-vision provides image analysis via the Vision framework. Subcommands: ocr (text recognition, --lang, --level fast/accurate), barcode (QR/barcode detection), classify (image classification), detect (rectangle detection), faces (face detection), analyze (combined ocr+classify+barcode+faces), "
             + "similarity <img1> <img2> [img3...] (feature-print based image similarity comparison with --threshold 0.0-1.0, returns pairwise distance/similarity scores and duplicate groups), "
             + "overlap <img1> <img2> [img3...] (detect vertical overlapping regions between consecutive image pairs — uses anchor row scan + multi-row verification to find exact stitch points; returns overlap_px, confidence, and region coordinates). Both similarity and overlap accept --threshold 0.0-1.0 (default 0.9). overlap also accepts --skip-top <px> and --skip-bottom <px> to exclude fixed UI (status bar, tab bar) that would cause false matches.\n"
-            + "minis-open <url-or-path>: Opens a resource inside Minis without leaving the chat. Accepts http/https URLs (→ built-in WebKit preview) and chat-resource file paths under /var/minis/** (→ built-in file preview, routed by extension: images to the image viewer, .md to markdown preview, .html to HTML preview, .pdf/office docs to QuickLook, audio/video to the media player, else share sheet). Examples: `minis-open https://example.com`, `minis-open /var/minis/workspace/report.md`, `minis-open /var/minis/attachments/chart.png`. Prefer this over `apple-open` for anything that can be previewed in-app so the user doesn't lose conversation context. Use `apple-open` for non-web schemes (tel:, mailto:, maps://, settings, etc.) or when the user explicitly wants the system handler.\n"
+            + "minis-open <url-or-path>: Opens a resource inside Fin without leaving the chat. Accepts http/https URLs (→ built-in WebKit preview) and chat-resource file paths under /var/minis/** (→ built-in file preview, routed by extension: images to the image viewer, .md to markdown preview, .html to HTML preview, .pdf/office docs to QuickLook, audio/video to the media player, else share sheet). Examples: `minis-open https://example.com`, `minis-open /var/minis/workspace/report.md`, `minis-open /var/minis/attachments/chart.png`. Prefer this over `apple-open` for anything that can be previewed in-app so the user doesn't lose conversation context. Use `apple-open` for non-web schemes (tel:, mailto:, maps://, settings, etc.) or when the user explicitly wants the system handler.\n"
             + "minis-sessions-cli: Manage chat sessions. `list` recent or by date range, `search --keywords` cross-session, `messages --id` to read, `send` to create/continue a session, `retry` to re-run, `status` to check, `open` to navigate the app UI. Run --help for full options.\n"
             + "minis-model-use: Invoke other LLM models pre-configured by the user. "
             + "You have \(ProviderConfigStore.shared.resolvedAgentLoopEntries.count) model(s) available. "
@@ -1912,7 +1912,7 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
             + "The optional init_command parameter pre-fills (NOT executes) a command; it MUST be fully percent-encoded (spaces → %20, & → %26, | → %7C, etc.). "
             + "Only use this for genuinely interactive sessions — for everything else, use shell_execute. "
             + "Examples: [Open Terminal](minis://open_terminal), [Login to SSH](minis://open_terminal?init_command=ssh%20user%40host).\n\n"
-            + "minis-config: read or change Minis settings programmatically. Run `minis-config --help` to see subcommands and `minis-config topic-help <topic>` for details on a specific area. For array-valued fields (e.g. `models`, `groups`, `envvars`, `defaults.agentLoopEntries`) the `get` subcommand accepts `--filter <keywords>` (whitespace-AND, case-insensitive substring match against each element's JSON) and `--page <N> --page-size <N>` (default 20, max 100) — use these instead of dumping the full list when you only need a subset, and check the response's `pagination` / `agent_hint` fields for the next-page command. Every write triggers a confirmation sheet in-app and is logged to a revertable audit (1000-entry rolling log). After a successful change the response includes a `user_message` field — relay it (or paraphrase) so the user knows how to review or revert via Logs → Config Changes. If the call returns `permission_denied`, the user has disabled minis-config in Settings → Permissions; relay that message and don't retry. You CAN add a provider (`add providers` with providerType + label, optional customBaseURL/appendV1Suffix/imageEndpointMode) and write its API key — set `providers.<id>.apiKey` (or include `apiKey` in the add payload) with either a literal key or a `$$ENV_VAR` reference resolved from the user's environment variables. Secrets are write-only: `get` never echoes an API key, and reading `providers.<id>.apiKey` / `.oauthToken` still returns permission_denied. Do not try to read API keys/OAuth tokens, or to set OAuth tokens (minted by the in-app login), permission levels, or environment-variable values — those stay locked.\n\n"
+            + "minis-config: read or change Fin settings programmatically. Run `minis-config --help` to see subcommands and `minis-config topic-help <topic>` for details on a specific area. For array-valued fields (e.g. `models`, `groups`, `envvars`, `defaults.agentLoopEntries`) the `get` subcommand accepts `--filter <keywords>` (whitespace-AND, case-insensitive substring match against each element's JSON) and `--page <N> --page-size <N>` (default 20, max 100) — use these instead of dumping the full list when you only need a subset, and check the response's `pagination` / `agent_hint` fields for the next-page command. Every write triggers a confirmation sheet in-app and is logged to a revertable audit (1000-entry rolling log). After a successful change the response includes a `user_message` field — relay it (or paraphrase) so the user knows how to review or revert via Logs → Config Changes. If the call returns `permission_denied`, the user has disabled minis-config in Settings → Permissions; relay that message and don't retry. You CAN add a provider (`add providers` with providerType + label, optional customBaseURL/appendV1Suffix/imageEndpointMode) and write its API key — set `providers.<id>.apiKey` (or include `apiKey` in the add payload) with either a literal key or a `$$ENV_VAR` reference resolved from the user's environment variables. Secrets are write-only: `get` never echoes an API key, and reading `providers.<id>.apiKey` / `.oauthToken` still returns permission_denied. Do not try to read API keys/OAuth tokens, or to set OAuth tokens (minted by the in-app login), permission levels, or environment-variable values — those stay locked.\n\n"
             + "Environment variables:\n"
             + "- Shell environment variables may contain sensitive API keys, tokens, or passwords. "
             + "NEVER echo, print, cat, or otherwise output their values to stdout/stderr. "
@@ -1980,7 +1980,7 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
     /// [T-shortcut-duplicate-completion-notification] Suppresses the *generic*
     /// background-completion notification for this run, because a Shortcuts
     /// intent already posts its own via `ShortcutNotification`. Without this the
-    /// user gets two overlapping notifications for one task: "Minis Task
+    /// user gets two overlapping notifications for one task: "Fin Task
     /// Completed" from the intent and "✅ {sessionTitle}" from
     /// `endBackgroundProcessing`.
     ///
@@ -4222,7 +4222,7 @@ final class AIChatViewModel: ObservableObject, SpeechControlling {
             // content, no committed prior iteration, and history does not
             // end with a tool_result (would mean Case 1 owns it). The
             // placeholder ChatMessage runAgentLoop pushed would otherwise
-            // render as a bare "Minis" header bubble with the typing
+            // render as a bare "Fin" header bubble with the typing
             // indicator hosted on it. Drop the placeholder so the UI snaps
             // back to idle. Boundary against #566/#569 8bb0bf83: a candidate
             // with any non-empty text block or any tool_use block is kept

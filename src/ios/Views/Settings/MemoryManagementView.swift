@@ -1,6 +1,6 @@
 //
 //  MemoryManagementView.swift
-//  MinisApp
+//  FinApp
 //
 //  Settings-level memory management: unified file list with edit/delete.
 //
@@ -297,7 +297,7 @@ private struct MemoryFileEditView: View {
             // [T-toast-feedback] Confirm the save succeeded — the screen
             // doesn't dismiss or change, so without this the user gets no
             // signal that the write landed.
-            MinisToast.show(String(localized: "Saved"))
+            FinToast.show(String(localized: "Saved"))
             // Enqueue for iCloud v2 sync. GLOBAL.md uses its own singleton
             // record; per-day logs use the dateKey from the filename.
             if isGlobal {
@@ -324,5 +324,5 @@ extension Notification.Name {
     /// locally — either by the user editing in MemoryManagementView, by
     /// memory_write tool, or by an inbound iCloud sync merge. Observers
     /// can use this to refresh their in-memory snapshot of memory files.
-    static let memoryFilesDidChange = Notification.Name("com.openminis.app.memoryFilesDidChange")
+    static let memoryFilesDidChange = Notification.Name("com.mrmusic.fin.memoryFilesDidChange")
 }

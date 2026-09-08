@@ -1,6 +1,6 @@
 //
 //  SessionsOffload.h
-//  MinisApp
+//  FinApp
 //
 //  Native offload handler for `minis-sessions-cli` — query chat sessions and messages.
 //

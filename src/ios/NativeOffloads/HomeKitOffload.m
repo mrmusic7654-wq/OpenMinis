@@ -1,6 +1,6 @@
 //
 //  HomeKitOffload.m
-//  MinisApp
+//  FinApp
 //
 //  Native offload handler for `apple-homekit`.
 //  Subcommands: list, search, get, set, scenes, trigger

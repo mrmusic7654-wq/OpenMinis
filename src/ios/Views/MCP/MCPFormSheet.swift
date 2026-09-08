@@ -1,6 +1,6 @@
 //
 //  MCPFormSheet.swift
-//  MinisApp
+//  FinApp
 //
 //  Add / edit form for a single MCP server. Transport picker switches between
 //  HTTP (URL + custom headers) and STDIO (command + args + env). SSE is treated
@@ -330,7 +330,7 @@ struct MCPFormSheet: View {
             } header: {
                 Text("Startup timeout (seconds)")
             } footer: {
-                Text("How long to wait for this server's first initialize. Raise it for slow-starting servers (e.g. uvx). Leave blank for the default (60s). Minis setting, not part of the MCP protocol.")
+                Text("How long to wait for this server's first initialize. Raise it for slow-starting servers (e.g. uvx). Leave blank for the default (60s). Fin setting, not part of the MCP protocol.")
             }
         }
     }
@@ -596,7 +596,7 @@ struct MCPFormSheet: View {
 private struct MCPConfigShareSheet: UIViewControllerRepresentable {
     let url: URL
     func makeUIViewController(context: Context) -> UIActivityViewController {
-        let safeURL = MinisShareSheet.sanitizedShareURL(url) ?? url
+        let safeURL = FinShareSheet.sanitizedShareURL(url) ?? url
         return UIActivityViewController(activityItems: [safeURL], applicationActivities: nil)
     }
     func updateUIViewController(_ vc: UIActivityViewController, context: Context) {}

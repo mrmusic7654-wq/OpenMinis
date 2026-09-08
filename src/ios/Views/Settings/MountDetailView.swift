@@ -1,6 +1,6 @@
 //
 //  MountDetailView.swift
-//  MinisApp
+//  FinApp
 //
 //  Unified detail page for both "Shared Folders" (shared/skills/memory) and
 //  "Mount External Folders" (user-picked external directories). Provides:
@@ -251,7 +251,7 @@ struct MountDetailView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Show in Files app")
                     Text(visibleInFiles
-                         ? String(localized: "This folder appears in Files → On My iPhone → Minis.")
+                         ? String(localized: "This folder appears in Files → On My iPhone → Fin.")
                          : String(localized: "This folder is hidden from the iOS Files app."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -340,7 +340,7 @@ struct MountDetailView: View {
     }
 
     private func signalFileProviderRoot() {
-        let domainIdentifier = NSFileProviderDomainIdentifier("com.openminis.app.files")
+        let domainIdentifier = NSFileProviderDomainIdentifier("com.mrmusic.fin.files")
         NSFileProviderManager.getDomainsWithCompletionHandler { domains, _ in
             guard let domain = domains.first(where: { $0.identifier == domainIdentifier }) else {
                 return

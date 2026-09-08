@@ -1,6 +1,6 @@
 //
 //  WeatherOffloadBridge.swift
-//  MinisApp
+//  FinApp
 //
 //  Swift bridge for WeatherKit, called from WeatherOffload.m.
 //  WeatherKit is Swift-only; this class exposes weather data as NSDictionary

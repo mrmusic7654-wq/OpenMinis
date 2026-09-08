@@ -280,11 +280,18 @@ private struct FolderSurface: ViewModifier {
     /// color. Sampling it gives pixel-level brightness parity with the
     /// collapsed card, perfectly seamless tiling, and zero perf risk —
     /// chosen by the user over a preference-propagation spike.
-    static let sampledGlassColor = Color(UIColor { traits in
-        traits.userInterfaceStyle == .dark
-            ? UIColor(red: 18/255.0, green: 18/255.0, blue: 18/255.0, alpha: 1)
-            : UIColor(red: 252/255.0, green: 252/255.0, blue: 252/255.0, alpha: 1)
-    })
+    ///
+    /// [T-app-themes] The sampled constants are only valid over the stock page
+    /// background; a visual theme swaps the page colour, so the card follows
+    /// the theme's `card` surface instead.
+    static var sampledGlassColor: Color {
+        guard ThemeSnapshot.current == .default else { return Color(ThemePalette.card) }
+        return Color(UIColor { traits in
+            traits.userInterfaceStyle == .dark
+                ? UIColor(red: 18/255.0, green: 18/255.0, blue: 18/255.0, alpha: 1)
+                : UIColor(red: 252/255.0, green: 252/255.0, blue: 252/255.0, alpha: 1)
+        })
+    }
 
     private var shape: AnyShape {
         switch kind {
@@ -949,10 +956,10 @@ struct ContentView: View {
     /// when `sessions` changes (see .onChange below).
     @State private var sessionsByIdCache: [String: ChatSession] = [:]
     /// Soul name shown as the sidebar title. Sourced from SOUL.md, falls
-    /// back to "Minis". Refreshed whenever SoulStore posts .soulMdChanged.
+    /// back to "Fin". Refreshed whenever SoulStore posts .soulMdChanged.
     @State private var soulName: String = SoulStore.cachedMetadata.name.isEmpty
-        ? "Minis" : SoulStore.cachedMetadata.name
-    /// Subtitle state shown under the "Minis" sidebar title. nil hides the
+        ? "Fin" : SoulStore.cachedMetadata.name
+    /// Subtitle state shown under the "Fin" sidebar title. nil hides the
     /// row; otherwise it renders as small capsules per type or a single
     /// status string. Refreshed by a 5s timer.
     @State private var migrationSubtitle: SyncSubtitleState?
@@ -1706,7 +1713,7 @@ struct ContentView: View {
             // the outgoing vm (any @Published delta, scroll signal, etc.)
             // races with `AG::Subgraph::NodeCache::~NodeCache` on the same
             // AsyncRenderer thread → EXC_BAD_ACCESS (build-48 crash
-            // Minis-2026-06-01-134710.ips). Suspend the outgoing vm here,
+            // Fin-2026-06-01-134710.ips). Suspend the outgoing vm here,
             // then schedule a resume on a short delay so when the user comes
             // back to that session everything catches up. Run before the
             // redirect/tracking-clear logic so we always pin the right id.
@@ -1784,7 +1791,7 @@ struct ContentView: View {
             // mitigation added for the 2026-06-01 build-48 crash simply did not
             // exist on the compact path.
             //
-            // Crash 2026-08-10 19:23 (Minis 1.12(1), iOS 26.5.2, iPhone18,1 —
+            // Crash 2026-08-10 19:23 (Fin 1.12(1), iOS 26.5.2, iPhone18,1 —
             // a STACK-layout device): EXC_BAD_ACCESS at 0xffffffff00000000 in
             // AG::Subgraph::~Subgraph → NodeCache::~NodeCache, reached from
             // `NavigationStackCoordinator.navigationController(_:willShow:)` →
@@ -2633,7 +2640,7 @@ struct ContentView: View {
         // and can't drop a .soulMdChanged notification arriving during reconstruction.
         .onReceive(NotificationCenter.default.publisher(for: .soulMdChanged)) { _ in
             let n = SoulStore.cachedMetadata.name
-            soulName = n.isEmpty ? "Minis" : n
+            soulName = n.isEmpty ? "Fin" : n
         }
     }
 
@@ -2704,7 +2711,7 @@ struct ContentView: View {
                                 .overlay {
                                     if regeneratingTitleSessionId == session.id {
                                         ZStack {
-                                            Color(.systemBackground).opacity(0.7)
+                                            Color(ThemePalette.background).opacity(0.7)
                                             ProgressView()
                                         }
                                     }
@@ -2719,7 +2726,7 @@ struct ContentView: View {
                                 if group.folderId != nil {
                                     FolderMemberRowBackground(isLast: sessionId == group.ids.last)
                                 } else {
-                                    Color(.systemBackground)
+                                    Color(ThemePalette.background)
                                 }
                             })
                             .contextMenu {
@@ -2752,6 +2759,7 @@ struct ContentView: View {
 
         }
         .listStyle(.plain)
+        .themedScreenBackground()
         #if DEBUG
         // TEMPORARY scroll-phase markers to bracket the jitter window in the
         // log. Pair with the [ROWH] probe: a [ROWH] line appearing during
@@ -2840,7 +2848,7 @@ struct ContentView: View {
                                 .overlay {
                                     if regeneratingTitleSessionId == session.id {
                                         ZStack {
-                                            Color(.systemBackground).opacity(0.7)
+                                            Color(ThemePalette.background).opacity(0.7)
                                             ProgressView()
                                         }
                                     }
@@ -2939,6 +2947,7 @@ struct ContentView: View {
 
         }
         .listStyle(.plain)
+        .themedScreenBackground()
         .navigationSplitViewColumnWidth(min: 340, ideal: 380, max: 500)
         .opacity(didInitialLoad ? 1 : 0)
         .overlay { if didInitialLoad, displaySessions.isEmpty, !isSearching { emptyState } }
@@ -3028,7 +3037,7 @@ struct ContentView: View {
                 if migrationSubtitle != next { migrationSubtitle = next }
             } else {
                 // No active sync work — hide the subtitle entirely so the
-                // "Minis" title sits at its normal size.
+                // "Fin" title sits at its normal size.
                 if migrationSubtitle != nil { migrationSubtitle = nil }
             }
         }
@@ -3057,7 +3066,7 @@ struct ContentView: View {
             .map { (label: $0.0, count: $0.1) }
     }
 
-    /// Tiny indicator next to the "Minis" title showing the sync state.
+    /// Tiny indicator next to the "Fin" title showing the sync state.
     @ViewBuilder
     private func titleSyncIndicator(for state: SyncSubtitleState?) -> some View {
         switch state {
@@ -3161,7 +3170,7 @@ struct ContentView: View {
                     if #available(iOS 17.0, *) { return SyncV2Bootstrap.isEnabled }
                     return false
                 }()
-                // Title text comes from SOUL.md (falls back to "Minis"). The
+                // Title text comes from SOUL.md (falls back to "Fin"). The
                 // leading sync indicator floats as an overlay so it doesn't
                 // take layout space — title stays perfectly centered in the
                 // navigation bar regardless of whether the indicator is visible.
@@ -3777,7 +3786,7 @@ struct ContentView: View {
                 .padding(.bottom, 4)
 
             VStack(spacing: 8) {
-                Text("Welcome to Minis")
+                Text("Welcome to Fin")
                     .font(.title2.bold())
                 Text("Your first On-Device Agent is almost ready.")
                     .font(.subheadline)
@@ -4019,9 +4028,11 @@ struct ContentView: View {
     /// rather than an opaque fill, so the button keeps its colour identity while
     /// the system material supplies the depth. Below 26 it stays the flat fill
     /// it has always been.
-    private static let newChatBrandColor = Color(UIColor { $0.userInterfaceStyle == .dark
-        ? UIColor(red: 80/255, green: 76/255, blue: 66/255, alpha: 1)
-        : UIColor(red: 183/255, green: 175/255, blue: 150/255, alpha: 1) })
+    ///
+    /// [T-app-themes] Resolved through `ThemePalette.fabAccent` so each visual
+    /// theme can pick its own FAB hue. The Default theme returns exactly the
+    /// historical warm brand pair (183/175/150 light, 80/76/66 dark).
+    private static var newChatBrandColor: Color { ThemePalette.fabAccent }
 
     /// Glass TINT for the new-chat FAB — deliberately NOT `newChatBrandColor`.
     ///
@@ -4039,9 +4050,17 @@ struct ContentView: View {
     /// ring std 9.3 vs 1.1 (real show-through) — and light mode keeps a warm
     /// cast (warmth 9.9) while staying visibly translucent.
     /// `Glass.tint` honours the colour's alpha, so the strength is baked in here.
-    private static let newChatGlassTint = Color(UIColor { $0.userInterfaceStyle == .dark
-        ? UIColor(red: 196/255, green: 176/255, blue: 120/255, alpha: 0.30)
-        : UIColor(red: 183/255, green: 175/255, blue: 150/255, alpha: 0.30) })
+    ///
+    /// [T-app-themes] Non-default themes tint with their own FAB accent at the
+    /// same 0.30 strength; the Default theme keeps the measured values above.
+    private static var newChatGlassTint: Color {
+        if ThemeSnapshot.current == .default {
+            return Color(UIColor { $0.userInterfaceStyle == .dark
+                ? UIColor(red: 196/255, green: 176/255, blue: 120/255, alpha: 0.30)
+                : UIColor(red: 183/255, green: 175/255, blue: 150/255, alpha: 0.30) })
+        }
+        return ThemePalette.fabAccent.opacity(0.30)
+    }
 
     /// Clear/dismiss control inside the expanded search capsule.
     ///
@@ -5396,7 +5415,7 @@ struct ContentView: View {
                 done += 1
                 if msg.isToolResultOnly { continue }
 
-                let role = msg.role == .user ? "User" : "Minis"
+                let role = msg.role == .user ? "User" : "Fin"
                 let time = timeFmt.string(from: msg.createdAt)
                 var parts: [String] = []
                 for part in msg.parts {
@@ -5801,8 +5820,8 @@ private struct ShareSheet: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIActivityViewController {
         // [T-share-sheet-uti] Defense against ShareKit's
         // UTTypeGetForIdentifier assert on Mac Catalyst — see
-        // MinisShareSheet.sanitizedShareURL for context.
-        let safeURL = MinisShareSheet.sanitizedShareURL(url) ?? url
+        // FinShareSheet.sanitizedShareURL for context.
+        let safeURL = FinShareSheet.sanitizedShareURL(url) ?? url
         return UIActivityViewController(activityItems: [safeURL], applicationActivities: nil)
     }
     func updateUIViewController(_ vc: UIActivityViewController, context: Context) {}
@@ -6949,6 +6968,25 @@ private struct AppearanceSettingsView: View {
                 }
             }
 
+            // [T-app-themes] Visual theme — an aesthetic (accent hue, surface
+            // tints, bubble colours) layered on top of the light/dark choice
+            // above. Every theme has a light AND a dark rendition, so the two
+            // pickers are orthogonal.
+            Section {
+                AppThemePicker(onWillChange: { _ in
+                    // Same drill as the language picker below: committing the
+                    // theme re-keys the root (`.id(...)` in FinApp.swift),
+                    // which drops this sheet. Arm the reopen hint so the user
+                    // lands back here. (ThemeManager itself pins any streaming
+                    // chats across the remount — see `ThemeManager.commit`.)
+                    UserDefaults.standard.set("appearance", forKey: "pendingSettingsReopen")
+                })
+            } header: {
+                Text("Visual Theme")
+            } footer: {
+                Text("Pick a colour theme for the whole app. Every theme has a light and a dark look, so it follows the Theme setting above.")
+            }
+
             Section {
                 Picker("Launch Session", selection: $launchScreen) {
                     Text("Auto").tag(0)
@@ -7107,7 +7145,7 @@ private struct AppearanceSettingsView: View {
                     Button {
                         // Persist a reopen-hint BEFORE flipping appLanguage —
                         // the @AppStorage write triggers the root
-                        // `.id(appLanguage)` rebuild in MinisApp.swift, which
+                        // `.id(appLanguage)` rebuild in FinApp.swift, which
                         // drops the entire view tree including the Settings
                         // sheet. ContentView/SettingsSheet read this flag on
                         // re-mount and reopen the sheet + push back to the
@@ -7461,7 +7499,7 @@ private struct SettingsSheet: View {
                         AboutView()
                     } label: {
                         Label {
-                            Text("About Minis")
+                            Text("About Fin")
                         } icon: {
                             Image(systemName: "info")
                                 .font(.system(size: 9))
@@ -7597,6 +7635,9 @@ private struct SettingsSheet: View {
                 applyPendingDeepLink()
             }
         }
+        // [T-app-themes] One modifier on the stack themes every settings page
+        // pushed inside it (scrollContentBackground propagates via environment).
+        .themedScreenBackground(grouped: true)
         .preferredColorScheme(appearanceMode == 1 ? .light : appearanceMode == 2 ? .dark : nil)
         .appFontScale()
     }
@@ -7688,7 +7729,7 @@ private struct SettingsSheet: View {
         components.scheme = "mailto"
         components.path = "dev@openminis.app"
         components.queryItems = [
-            URLQueryItem(name: "subject", value: "Minis Feedback"),
+            URLQueryItem(name: "subject", value: "Fin Feedback"),
             URLQueryItem(name: "body", value: body),
         ]
         return components.url
@@ -7716,7 +7757,7 @@ private struct SettingsSheet: View {
         |-------|-------|
         | Platform | iOS |
         | OS Version | iOS \(iosVersion) |
-        | Minis Version | \(appVersion) (build \(build)) |
+        | Fin Version | \(appVersion) (build \(build)) |
         | Device Model | \(device) |
 
         ## 🔁 Steps to Reproduce

@@ -1,6 +1,6 @@
 //
 //  DebugOffload.h
-//  MinisApp
+//  FinApp
 //
 //  Native offload handler for `minis-debug`. RPC-backed subcommands are
 //  Debug-build-only (they route through DebugLocalDispatch, compiled out in

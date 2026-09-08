@@ -1,6 +1,6 @@
 //
 //  ISHKernel.m
-//  MinisApp
+//  FinApp
 //
 //  Objective-C wrapper for iSH kernel initialization and control
 //
@@ -85,7 +85,7 @@ extern const char *sock_tmp_prefix;
 
 // [fork-guard] Stall guest fork() while the app's memory footprint is too high.
 //
-// Every guest process lives inside Minis.app's own address space, so a burst
+// Every guest process lives inside Fin.app's own address space, so a burst
 // like `xargs -P 15` running 32MB Go binaries adds ~480MB to the app's iOS
 // footprint and gets the whole app SIGKILLed by Jetsam.
 //
@@ -836,7 +836,7 @@ static void handle_process_exit(struct task *task, int code) {
 /// had to fall back to loopback TCP.
 ///
 /// Upstream iSH fixed this in 2019 (`7704024a`) inside `app/AppDelegate.m`.
-/// Minis does not compile that file — this class is its equivalent, and it
+/// Fin does not compile that file — this class is its equivalent, and it
 /// mirrors every other init from it (do_mount, DNS, exit_hook, tty_drivers,
 /// create_stdio) EXCEPT this one line. So this is a re-alignment with upstream,
 /// not a new mechanism, which is also why the fix belongs here rather than in
@@ -1823,7 +1823,7 @@ static void gov_tick(void) {
 - (void)beginBackgroundCPUGovernor {
     if (g_gov_timer) return;  // idempotent
     if (!g_gov_queue)
-        g_gov_queue = dispatch_queue_create("com.openminis.ish.cpugovernor",
+        g_gov_queue = dispatch_queue_create("com.mrmusic.fin.ish.cpugovernor",
             dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_UTILITY, 0));
 
     g_gov_head = 0;

@@ -65,24 +65,36 @@ private final class CachedViewModel: ObservableObject {
     }
 }
 
-// MARK: - Color Palette (clean light theme)
+// MARK: - Color Palette
 
+/// Chat colour tokens. Every accessor is computed from `ThemePalette` so the
+/// active visual theme (Settings → Appearance → Visual Theme) flows into the
+/// chat surface; with the Default theme these resolve to exactly the system
+/// semantic colours they used to be. They stay dynamic (light/dark aware) —
+/// the theme only changes the *hue* of each role, never which role is used.
 enum ChatColors {
-    static let background = Color(UIColor.systemBackground)
-    static let secondaryBg = Color(UIColor.secondarySystemBackground)
-    static let inputIconBg = Color(UIColor.secondarySystemBackground)
-    static let inputIconBorder = Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.35, alpha: 1) : UIColor(white: 0, alpha: 0) })
-    static let inputBg = Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.12, alpha: 1) : .white })
-    static let inputBorder = Color(UIColor.separator)
-    static let primaryText = Color(UIColor.label)
-    static let secondaryText = Color(UIColor.secondaryLabel)
-    static let tertiaryText = Color(UIColor.tertiaryLabel)
-    static let userBubble = Color(UIColor.tertiarySystemFill)
-    static let toolBg = Color(UIColor.tertiarySystemGroupedBackground)
-    static let toolBorder = Color(UIColor.separator).opacity(0.5)
-    static let accent = Color(UIColor.label)
-    static let sendButton = Color(UIColor.label)
-    static let sendButtonDisabled = Color(UIColor.quaternaryLabel)
+    static var background: Color { Color(ThemePalette.background) }
+    static var secondaryBg: Color { Color(ThemePalette.secondaryBackground) }
+    static var inputIconBg: Color { Color(ThemePalette.secondaryBackground) }
+    static var inputIconBorder: Color {
+        Color(UIColor { traits in
+            guard traits.userInterfaceStyle == .dark else { return UIColor(white: 0, alpha: 0) }
+            return ThemeSnapshot.current == .default
+                ? UIColor(white: 0.35, alpha: 1)
+                : ThemePalette.separator.resolvedColor(with: traits)
+        })
+    }
+    static var inputBg: Color { Color(ThemePalette.inputBackground) }
+    static var inputBorder: Color { Color(ThemePalette.separator) }
+    static var primaryText: Color { Color(ThemePalette.primaryText) }
+    static var secondaryText: Color { Color(ThemePalette.secondaryText) }
+    static var tertiaryText: Color { Color(ThemePalette.tertiaryText) }
+    static var userBubble: Color { Color(ThemePalette.userBubble) }
+    static var toolBg: Color { Color(ThemePalette.toolBackground) }
+    static var toolBorder: Color { Color(ThemePalette.separator).opacity(0.5) }
+    static var accent: Color { Color(ThemePalette.primaryText) }
+    static var sendButton: Color { Color(ThemePalette.primaryText) }
+    static var sendButtonDisabled: Color { Color(ThemePalette.quaternaryText) }
 }
 
 // MARK: - System Resource Monitor
@@ -447,9 +459,9 @@ struct AIChatView: View {
     /// Session being edited via the title-pill tap. Drives the SessionEditSheet.
     @State private var titlePillEditSession: ChatSession?
     /// Default chat title for sessions without a generated title. Sourced
-    /// from SOUL.md (`name`), falls back to "Minis". Refreshed on .soulMdChanged.
+    /// from SOUL.md (`name`), falls back to "Fin". Refreshed on .soulMdChanged.
     @State private var soulName: String = SoulStore.cachedMetadata.name.isEmpty
-        ? "Minis" : SoulStore.cachedMetadata.name
+        ? "Fin" : SoulStore.cachedMetadata.name
 
     /// True when any sheet or fullScreenCover is presented (suppress auto-focus to avoid keyboard bugs).
     private var hasOverlayPresented: Bool {
@@ -905,7 +917,7 @@ struct AIChatView: View {
             MinisDocumentPreviewView(fileURL: fileURL)
         }
         .sheet(item: $shareFile) { fileURL in
-            MinisShareSheet(url: fileURL)
+            FinShareSheet(url: fileURL)
         }
         .sheet(item: $safariURL) { url in
             MinisLinkPreviewView(url: url, browserPool: vm.browserTabPool, onExpand: { _ in
@@ -1987,7 +1999,7 @@ struct AIChatView: View {
         // when one exists (auto-generated or user-renamed). Tap opens the
         // same SessionEditSheet used from the home screen so users can
         // rename / re-categorize without leaving the chat. Falls back to
-        // the SOUL.md `name` (or "Minis") for draft sessions or before a
+        // the SOUL.md `name` (or "Fin") for draft sessions or before a
         // title has been generated.
         let sessionTitle: String? = (titlePillSession?.title?.trimmingCharacters(in: .whitespacesAndNewlines))
             .flatMap { $0.isEmpty ? nil : $0 }
@@ -2024,7 +2036,7 @@ struct AIChatView: View {
         // 2026-05-20 tightening overlapped row 2 into the title's line box by
         // 8pt — more than the 13pt font's entire descender zone (~3.1pt), so
         // any title containing g/p/y/z visually fused with the model pill
-        // (only descender-less titles like "Minis" hid it). -3 keeps a ~2pt
+        // (only descender-less titles like "Fin" hid it). -3 keeps a ~2pt
         // visible gap for descender titles. HEIGHT-NEUTRAL: the 5pt spent
         // here is reclaimed inside row 2 (provider-row bottom clearance
         // 4 → 1 and group vertical padding 3 → 2 on legacy), so the stack's
@@ -2082,7 +2094,7 @@ struct AIChatView: View {
                     .padding(.top, legacyLayout ? 0 : 2)
                     .onReceive(NotificationCenter.default.publisher(for: .soulMdChanged)) { _ in
                         let n = SoulStore.cachedMetadata.name
-                        soulName = n.isEmpty ? "Minis" : n
+                        soulName = n.isEmpty ? "Fin" : n
                     }
             }
             .buttonStyle(.plain)
@@ -2326,7 +2338,7 @@ struct AIChatView: View {
                     || next?.title != titlePillSession?.title
                     || next?.category != titlePillSession?.category {
                     // Direct replace — animating the toolbar title makes the
-                    // old "Minis" string slide before the real title swaps
+                    // old "Fin" string slide before the real title swaps
                     // in, which looks broken. SwiftUI's default crossfade
                     // for non-animated text changes is what we want.
                     titlePillSession = next
@@ -2660,7 +2672,7 @@ struct AIChatView: View {
     /// only when read-replies is enabled.
     @ViewBuilder
     // The read-replies speech capsule is now a SINGLE app-root instance (mounted
-    // in MinisApp beside AudioPiPCapsule) so it persists across chat → home. No
+    // in FinApp beside AudioPiPCapsule) so it persists across chat → home. No
     // per-session copy is rendered here anymore.
     private var floatingSpeechButton: some View { EmptyView() }
 

@@ -1,6 +1,6 @@
 //
 //  WebPreviewSheet.swift
-//  MinisApp
+//  FinApp
 //
 //  Safari-style full-screen web preview + half-sheet link preview,
 //  plus the shared WKWebView holder that is re-parented between the
@@ -614,7 +614,7 @@ struct MinisSafariView: View {
         .persistentSystemOverlays(.hidden)
         .preferredColorScheme(appearanceMode == 1 ? .light : appearanceMode == 2 ? .dark : nil)
         .sheet(isPresented: $showShareSheet) {
-            MinisShareSheet(url: shareURL)
+            FinShareSheet(url: shareURL)
         }
     }
 
@@ -785,7 +785,7 @@ struct MinisLinkPreviewView: View {
         // and leaving dismiss enabled preserves nav-bar pull-down + xmark.
         .preferredColorScheme(appearanceMode == 1 ? .light : appearanceMode == 2 ? .dark : nil)
         .sheet(isPresented: $showShareSheet) {
-            MinisShareSheet(url: url)
+            FinShareSheet(url: url)
         }
     }
 }

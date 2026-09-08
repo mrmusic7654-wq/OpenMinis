@@ -103,7 +103,7 @@ final class DebugJSONRPC: @unchecked Sendable {
     private static let responseMeta: [String: Any] = {
         let info = Bundle.main.infoDictionary ?? [:]
         return [
-            "app": "MinisApp",
+            "app": "FinApp",
             "version": info["CFBundleShortVersionString"] as? String ?? "?",
             "build": info["CFBundleVersion"] as? String ?? "?",
             "device": DeviceIdentity.deviceName,
@@ -1204,7 +1204,7 @@ final class DebugJSONRPC: @unchecked Sendable {
             query.sortDescriptors = [NSSortDescriptor(key: key, ascending: sortAscending)]
         }
         let zoneID = CKRecordZone.ID(zoneName: zoneName)
-        let container = CKContainer(identifier: "iCloud.com.openminis.app")
+        let container = CKContainer(identifier: "iCloud.com.mrmusic.fin")
         do {
             let result = try await container.privateCloudDatabase.records(
                 matching: query,
@@ -1258,7 +1258,7 @@ final class DebugJSONRPC: @unchecked Sendable {
     /// (minis-shared / minis-devices / minis-secrets) when migration
     /// counters look suspect.
     private func handleSyncAllZones() async -> Any {
-        let container = CKContainer(identifier: "iCloud.com.openminis.app")
+        let container = CKContainer(identifier: "iCloud.com.mrmusic.fin")
         do {
             let zones = try await container.privateCloudDatabase.allRecordZones()
             return [
@@ -1306,7 +1306,7 @@ final class DebugJSONRPC: @unchecked Sendable {
     ///   recordTypes (optional): override the default per-zone type
     ///     list. Useful for ad-hoc probes.
     private func handleSyncZoneStats(params: [String: Any]) async -> Any {
-        let containerId = "iCloud.com.openminis.app"
+        let containerId = "iCloud.com.mrmusic.fin"
         let container = CKContainer(identifier: containerId)
         let db = container.privateCloudDatabase
 
@@ -1806,7 +1806,7 @@ final class DebugJSONRPC: @unchecked Sendable {
         // where the FileProvider extension writes its diagnostic log.
         if stripped.hasPrefix("AppGroup/") {
             let fm = FileManager.default
-            if let container = fm.containerURL(forSecurityApplicationGroupIdentifier: "group.com.openminis.app") {
+            if let container = fm.containerURL(forSecurityApplicationGroupIdentifier: "group.com.mrmusic.fin") {
                 let relative = String(stripped.dropFirst("AppGroup/".count))
                 return relative.isEmpty ? container : container.appendingPathComponent(relative)
             }
@@ -2242,7 +2242,7 @@ final class DebugJSONRPC: @unchecked Sendable {
         // find_and_tap RPC on 127.0.0.1:8200. iCTRL is a UI test bundle so
         // it has XCUIElement.tap(), which drives the OS's real touch
         // pipeline and works on SwiftUI Lists / hosting-view content that
-        // MinisApp's app-embedded synthesis can't reach. iCTRL's isLoopback
+        // FinApp's app-embedded synthesis can't reach. iCTRL's isLoopback
         // check bypasses its bearer auth for us. If iCTRL isn't running (or
         // returns "no element found") we fall through to the existing app-
         // embedded escalation ladder — behaviour unchanged when the tool
@@ -2356,10 +2356,10 @@ final class DebugJSONRPC: @unchecked Sendable {
         }
 
         // iCTRL defaults to querying whatever app is currently bound (or
-        // SpringBoard if none). Since debug.tap is called BY MinisApp asking
+        // SpringBoard if none). Since debug.tap is called BY FinApp asking
         // to tap something in ITSELF, pin the query to our own bundle id
         // unless the caller explicitly overrides via ictrl_bundle_id.
-        let bundleId = (params["ictrl_bundle_id"] as? String) ?? Bundle.main.bundleIdentifier ?? "com.openminis.app"
+        let bundleId = (params["ictrl_bundle_id"] as? String) ?? Bundle.main.bundleIdentifier ?? "com.mrmusic.fin"
         let rpcParams: [String: Any] = [
             "element_id": elementId,
             "match": matchMode,
@@ -2477,7 +2477,7 @@ final class DebugJSONRPC: @unchecked Sendable {
         // customAction target.perform → Foundation recursion → NSException →
         // abort, taking the whole app down from a debug-server tap RPC fired
         // during launch). Swift can't catch ObjC exceptions — run each
-        // invocation under MinisCatchObjCException and treat a raise as
+        // invocation under FinCatchObjCException and treat a raise as
         // "this node didn't activate" instead of terminating the process.
         var stack: [UIView] = [root]
         var visits = 0
@@ -2485,7 +2485,7 @@ final class DebugJSONRPC: @unchecked Sendable {
         func attempt(_ label: String, _ body: () -> Bool) -> Bool {
             var accepted = false
             var reason: NSString?
-            let ok = MinisCatchObjCException({ accepted = body() }, &reason)
+            let ok = FinCatchObjCException({ accepted = body() }, &reason)
             if !ok {
                 caughtReason = reason
                 AppLogger(category: "DebugServer").error("[debug.tap] \(label) raised NSException (caught): \(reason ?? "?")")
@@ -2550,7 +2550,7 @@ final class DebugJSONRPC: @unchecked Sendable {
             // raise an ObjC exception Swift can't catch.
             // [T-ios-debugtap-nsexception-abort]
             var sendReason: NSString?
-            if !MinisCatchObjCException({ control.sendActions(for: .touchUpInside) }, &sendReason) {
+            if !FinCatchObjCException({ control.sendActions(for: .touchUpInside) }, &sendReason) {
                 AppLogger(category: "DebugServer").error("[debug.tap] sendActions raised NSException (caught): \(sendReason ?? "?")")
                 return ["ok": false, "strategy": strategy,
                         "error": "target action raised NSException: \(sendReason ?? "?")"]
@@ -2774,7 +2774,7 @@ final class DebugJSONRPC: @unchecked Sendable {
         // bridge and fall back to a fixed error envelope.
         var data: Data?
         var reason: NSString?
-        let ok = MinisCatchObjCException({
+        let ok = FinCatchObjCException({
             data = try? JSONSerialization.data(withJSONObject: obj, options: [.sortedKeys])
         }, &reason)
         guard ok, let data, let str = String(data: data, encoding: .utf8) else {

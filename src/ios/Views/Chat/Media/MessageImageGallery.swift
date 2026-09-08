@@ -1,6 +1,6 @@
 //
 //  MessageImageGallery.swift
-//  MinisApp
+//  FinApp
 //
 //  Paged fullscreen image gallery shared by both preview paths:
 //    1. User-message attachments (via \.openImageGallery environment action)
@@ -136,7 +136,7 @@ struct MessageImageGallery: View {
             if let img = currentImage,
                let data = img.pngData(),
                let tmpURL = Self.writeTempImageFile(data: data) {
-                MinisShareSheet(url: tmpURL)
+                FinShareSheet(url: tmpURL)
             }
         }
         .statusBar(hidden: true)

@@ -300,7 +300,7 @@ struct SyncMigrationDetailView: View {
                         HStack(spacing: 8) {
                             Image(systemName: "pause.circle.fill")
                                 .foregroundStyle(.orange)
-                            Text("Paused — reopen Minis to continue")
+                            Text("Paused — reopen Fin to continue")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -603,7 +603,7 @@ struct SyncMigrationDetailView: View {
         } header: {
             Text("iCloud Zones")
         } footer: {
-            Text("Every zone Minis has created in your iCloud private database. **V2** holds the current sync engine's data; **V1** holds legacy per-device backups from older builds. Deleting a zone is permanent and removes everything inside (records + assets). Use this to reclaim space after migration completes.")
+            Text("Every zone Fin has created in your iCloud private database. **V2** holds the current sync engine's data; **V1** holds legacy per-device backups from older builds. Deleting a zone is permanent and removes everything inside (records + assets). Use this to reclaim space after migration completes.")
                 .font(.caption)
         }
     }
@@ -675,7 +675,7 @@ struct SyncMigrationDetailView: View {
             }
             return String(localized: "V1 sync (legacy) · another device's pre-v2 backup. Safe to delete if that device has migrated to V2.")
         case .system:
-            return String(localized: "CloudKit built-in zone. Not used by Minis.")
+            return String(localized: "CloudKit built-in zone. Not used by Fin.")
         case .other:
             return String(localized: "Legacy or unknown zone. Inspect before deleting.")
         case .v2:
@@ -754,7 +754,7 @@ struct SyncMigrationDetailView: View {
             let zones = try await V1FetcherShim.listAllZones()
             zonesList = zones
                 // _defaultZone is CloudKit's built-in zone present in every
-                // private database. Minis never writes to it and CK refuses
+                // private database. Fin never writes to it and CK refuses
                 // to delete it, so showing it just adds noise + a disabled
                 // trash button. Hide it.
                 .filter { $0.name != "_defaultZone" }

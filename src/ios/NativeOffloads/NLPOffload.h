@@ -1,6 +1,6 @@
 //
 //  NLPOffload.h
-//  MinisApp
+//  FinApp
 //
 //  Native offload handler for `apple-nlp` — NaturalLanguage framework.
 //

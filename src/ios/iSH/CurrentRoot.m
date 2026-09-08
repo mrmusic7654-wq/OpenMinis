@@ -1,6 +1,6 @@
 //
 //  CurrentRoot.m
-//  Minis — adapted from iSH app/CurrentRoot.m
+//  Fin — adapted from iSH app/CurrentRoot.m
 //
 //  Applies rootfs overlay patches from RootfsPatch.bundle on boot.
 //

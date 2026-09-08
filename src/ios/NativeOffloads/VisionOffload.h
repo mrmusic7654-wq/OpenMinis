@@ -1,6 +1,6 @@
 //
 //  VisionOffload.h
-//  MinisApp
+//  FinApp
 //
 //  Native offload handler for `apple-vision` — Vision framework.
 //

@@ -2,6 +2,7 @@
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![Platforms](https://img.shields.io/badge/Platforms-iOS%20%7C%20Android-lightgrey.svg)](#beta-programme)
+[![Android APK](https://github.com/mrmusic7654-wq/OpenMinis/actions/workflows/android.yml/badge.svg)](https://github.com/mrmusic7654-wq/OpenMinis/actions/workflows/android.yml)
 
 **Your private, on-device AI agent.**
 
@@ -133,7 +134,7 @@ cd OpenMinis
 # iOS  — order matters: FFmpeg links against LAME
 ./deps/build_lame.sh && ./deps/build_ffmpeg.sh
 ./deps/build_ish.sh && ./deps/prepare_alpine_rootfs.sh
-open src/ios/Minis.xcodeproj
+open src/ios/Fin.xcodeproj
 
 # Android — needs NDK r28+
 ./deps/build_proot.sh && ./scripts/prepare_android_sandbox.sh

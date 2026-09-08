@@ -1,6 +1,6 @@
 //
 //  PlayerOffloadBridge.swift
-//  MinisApp
+//  FinApp
 //
 //  Swift bridge for apple-player offload — manages playback sessions
 //  using the shared UI components (MinisAudioPreviewView, MinisVideoFullscreenPlayer).

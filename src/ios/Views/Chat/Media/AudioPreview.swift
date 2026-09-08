@@ -1,6 +1,6 @@
 //
 //  AudioPreview.swift
-//  MinisApp
+//  FinApp
 //
 //  Standalone audio preview sheet with artwork, scrubber, controls,
 //  export to document picker, and PiP activation. Extracted from
@@ -55,7 +55,7 @@ struct MinisAudioPreviewView: View {
             // button is the user-facing way to stop playback.
         }
         .sheet(isPresented: $showShareSheet) {
-            MinisShareSheet(url: fileURL)
+            FinShareSheet(url: fileURL)
         }
         .sheet(isPresented: $showSavePicker) {
             AudioFileSavePicker(url: fileURL)

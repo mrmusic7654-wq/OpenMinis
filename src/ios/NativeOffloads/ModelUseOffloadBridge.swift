@@ -1,6 +1,6 @@
 //
 //  ModelUseOffloadBridge.swift
-//  MinisApp
+//  FinApp
 //
 //  Swift bridge for minis-model-use offload — lists, searches,
 //  and invokes LLM models using configured providers.

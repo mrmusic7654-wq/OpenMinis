@@ -294,7 +294,7 @@ final class LoggingManager: ObservableObject {
     private func safeWrite(_ data: Data) -> Bool {
         guard let handle = logFileHandle else { return false }
         var reason: NSString?
-        let ok = MinisFileHandleSafeWrite(handle, data, &reason)
+        let ok = FinFileHandleSafeWrite(handle, data, &reason)
         if !ok {
             // Drop the handle — next rotateLogFileIfNeeded() will recreate
             // it against a fresh fd (or the next calendar-day rollover).

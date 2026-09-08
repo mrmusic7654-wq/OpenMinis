@@ -1,6 +1,6 @@
 //
 //  ImagePreview.swift
-//  MinisApp
+//  FinApp
 //
 //  In-bubble zoomable image + fullscreen image preview with pinch/zoom/
 //  drag/save/share. Extracted from AIChatView.swift.
@@ -505,7 +505,7 @@ struct ImagePreviewView: View {
         }
         .sheet(isPresented: $showShareSheet) {
             if let data = image.pngData(), let tmpURL = Self.writeTempImageFile(data: data) {
-                MinisShareSheet(url: tmpURL)
+                FinShareSheet(url: tmpURL)
             }
         }
         .statusBar(hidden: true)

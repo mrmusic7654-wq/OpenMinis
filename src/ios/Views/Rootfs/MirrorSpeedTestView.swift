@@ -1,6 +1,6 @@
 //
 //  MirrorSpeedTestView.swift
-//  MinisApp
+//  FinApp
 //
 //  Auto-detect fastest mirrors for Alpine APK, Python pip, and Node.js npm.
 //

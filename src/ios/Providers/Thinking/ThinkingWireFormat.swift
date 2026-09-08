@@ -84,7 +84,7 @@ enum ThinkingWireFormat: Equatable {
 
     /// Nested boolean under `extra_body`, e.g. `extra_body.thinking.enabled`.
     /// DeepSeek's official endpoint reasons by default and its real switch lives here;
-    /// Minis never sent it, which is why the official endpoint always ran its default
+    /// Fin never sent it, which is why the official endpoint always ran its default
     /// configuration (OpenMinis#171).
     case extraBodyToggle(path: String)
 

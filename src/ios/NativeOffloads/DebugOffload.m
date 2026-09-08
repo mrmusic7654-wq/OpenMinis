@@ -1,6 +1,6 @@
 //
 //  DebugOffload.m
-//  MinisApp
+//  FinApp
 //
 //  Native offload handler for `minis-debug`.
 //  Most subcommands (viewTree / search / inspect / ls / readFile / writeFile /
@@ -20,10 +20,10 @@
 
 #import <Foundation/Foundation.h>
 #import "NativeOffloadUtils.h"
-#if __has_include("Minis-Swift.h")
-#import "Minis-Swift.h"
-#elif __has_include("MinisApp-Swift.h")
-#import "MinisApp-Swift.h"
+#if __has_include("Fin-Swift.h")
+#import "Fin-Swift.h"
+#elif __has_include("FinApp-Swift.h")
+#import "FinApp-Swift.h"
 #endif
 #include "kernel/native_offload.h"
 #include <unistd.h>
@@ -106,14 +106,14 @@ static NSNumber *_Nullable opt_double(int argc, char **argv, const char *name) {
 
 #pragma mark - logs (Release-safe, in-process — no DebugLocalDispatch)
 
-/// Read the app's own runtime log via the Swift MinisDebugLogReader bridge
+/// Read the app's own runtime log via the Swift FinDebugLogReader bridge
 /// (OSLogStore + LoggingManager file). Unlike every other subcommand this does
 /// NOT route through DebugLocalDispatch, so it works in Release builds.
 static int cmd_logs(int argc, char **argv, int stdout_fd, int stderr_fd, BOOL compact, BOOL quiet) {
-    Class reader = NSClassFromString(@"MinisDebugLogReader");
+    Class reader = NSClassFromString(@"FinDebugLogReader");
     if (!reader) {
         NSDictionary *err = noff_json_error(TOOL_NAME, @"logs", NOFF_ERR_INTERNAL_ERROR,
-                                             @"MinisDebugLogReader bridge unavailable");
+                                             @"FinDebugLogReader bridge unavailable");
         noff_emit_json(stdout_fd, err, compact, quiet);
         return NOFF_EXIT_ERROR;
     }
@@ -121,7 +121,7 @@ static int cmd_logs(int argc, char **argv, int stdout_fd, int stderr_fd, BOOL co
     SEL sel = @selector(readLogsJSONWithLastN:minutes:grep:);
     if (!shared || ![shared respondsToSelector:sel]) {
         NSDictionary *err = noff_json_error(TOOL_NAME, @"logs", NOFF_ERR_INTERNAL_ERROR,
-                                             @"MinisDebugLogReader.readLogsJSON missing");
+                                             @"FinDebugLogReader.readLogsJSON missing");
         noff_emit_json(stdout_fd, err, compact, quiet);
         return NOFF_EXIT_ERROR;
     }

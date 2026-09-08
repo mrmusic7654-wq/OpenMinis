@@ -1,6 +1,6 @@
 //
 //  CalendarOffload.h
-//  MinisApp
+//  FinApp
 //
 //  Native offload handler for `apple-calendar` — EventKit events & reminders.
 //

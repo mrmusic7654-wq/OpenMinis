@@ -1,6 +1,6 @@
 //
 //  SessionMemoryView.swift
-//  MinisApp
+//  FinApp
 //
 //  Shows all memory used in the current session: auto-injected + tool-recalled.
 //

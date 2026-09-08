@@ -1,6 +1,6 @@
 //
 //  RootfsManager.swift
-//  MinisApp
+//  FinApp
 //
 //  Manages Alpine Linux rootfs installation and paths
 //
